@@ -7,7 +7,7 @@ import { ChangeAction, createChangeItem } from "./change-plan.mjs"
 import { waitUntilActionIsBuilt } from "./helpers.mjs"
 
 // Constants
-export const CUSTOM_CLAIMS_NAMESPACE = "https://example.com"
+export const CUSTOM_CLAIMS_NAMESPACE = "https://belay.dev"
 export const BELAY_PROVISIONING_ACTION_NAME = "Belay Provisioning"
 const BELAY_PROVISIONING_ACTION_FILE = "./actions/belay-provisioning.js"
 export const BLOCK_DISPOSABLE_ACTION_NAME = "Block Disposable Domains"

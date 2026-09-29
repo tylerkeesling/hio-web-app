@@ -6,8 +6,8 @@ import { ChangeAction, createChangeItem } from "./change-plan.mjs"
 
 // Constants
 export const APP_BASE_URL = "http://localhost:3000"
-export const MANAGEMENT_CLIENT_NAME = "SaaStart Management"
-export const DASHBOARD_CLIENT_NAME = "SaaStart Dashboard"
+export const MANAGEMENT_CLIENT_NAME = "Belay Onboarding"
+export const DASHBOARD_CLIENT_NAME = "Belay App"
 
 const MANAGEMENT_API_SCOPES = [
   // Users

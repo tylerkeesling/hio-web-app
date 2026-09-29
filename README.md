@@ -147,7 +147,7 @@ Before running the bootstrap script, you need to create a file with user-specifi
    - `NEXT_PUBLIC_AUTH0_DOMAIN`: Your Auth0 tenant domain use your custom domain if you have one, otherwise use the tenant canonical domain (e.g., `auth.mydomain.com` or `my-tenant.us.auth0.com`)
    - `SESSION_ENCRYPTION_SECRET`: A random 32-character string for session encryption
      - Generate one with: `openssl rand -hex 32`
-   - `CUSTOM_CLAIMS_NAMESPACE`: A namespace for custom claims (default: `https://example.com`)
+   - `CUSTOM_CLAIMS_NAMESPACE`: A namespace for custom claims (default: `https://belay.dev`)
 
    > **Note:** The bootstrap script will automatically merge `.env.local.user` into `.env.local`, so you only need to maintain your user-specific values in this file.
 

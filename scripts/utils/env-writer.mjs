@@ -46,7 +46,7 @@ AUTH0_MEMBER_ROLE_ID='${memberRoleId}'
 # Database Connection Configuration
 DEFAULT_CONNECTION_ID='${connectionId}'
 
-# The namespace used to prefix custom claims (e.g., https://example.com)
+# The namespace used to prefix custom claims (e.g., https://belay.dev)
 CUSTOM_CLAIMS_NAMESPACE='${CUSTOM_CLAIMS_NAMESPACE}'
 `
 
