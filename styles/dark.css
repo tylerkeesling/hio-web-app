@@ -1,163 +1,55 @@
 .dark {
-    --color-page: oklch(21.34% 0 0);
-    --color-background: oklch(0.2103 0.0059 285.89);
-    --color-foreground: oklch(94.91% 0 0);
-    --color-card: oklch(0% 0 0);
-    --color-card-foreground: oklch(100% 0 0);
-    --color-popover: oklch(0% 0 0);
-    --color-popover-foreground: oklch(94.91% 0 0);
-    --color-secondary: oklch(25.2% 0 0);
-    --color-secondary-foreground: oklch(17.76% 0 0);
-    --color-muted: oklch(25.2% 0 0);
-    --color-muted-foreground: oklch(58.29% 0 0);
-    --color-accent: oklch(53.82% 0 0);
-    --color-accent-foreground: oklch(94.91% 0 0);
-    --color-destructive: oklch(35.39% 0.0591 31.56);
-    --color-destructive-foreground: oklch(79.26% 0.1824 30.09);
-    --color-border: oklch(34.85% 0 0);
-    --color-input: oklch(0% 0 0);
+  /* Belay semantic tokens (consumed by Auth0 Universal Components) */
+  --color-page: #0c0b08;
+  --color-background: #14130f;
+  --color-foreground: #f4f4f1;
+  --color-card: #14130f;
+  --color-card-foreground: #f4f4f1;
+  --color-popover: #17160f;
+  --color-popover-foreground: #f4f4f1;
+  --color-secondary: #1f1e19;
+  --color-secondary-foreground: #f4f4f1;
+  --color-muted: #1f1e19;
+  --color-muted-foreground: #a1a1a8;
+  --color-accent: #26262b;
+  --color-accent-foreground: #f4f4f1;
+  --color-destructive: #3b1414;
+  --color-destructive-foreground: #fca5a5;
+  --color-border: #2a2a2f;
+  --color-input: #14130f;
 
-    /* Bevel Shadows */
-    --shadow-bevel-xs:
-      0px 0px 0px 1px oklch(100% 0 0 / 10%), 0px 2px 2px -1px oklch(0% 0 0 / 5%),
-      0px 1px 1px -0.5px oklch(0% 0 0 / 5%), inset 0px -1.5px 1.5px -1.5px oklch(0% 0 0 / 5%),
-      inset 0px 3px 3px -1.5px oklch(100% 0 0 / 10%);
-    --shadow-bevel-sm:
-      0px 0px 0px 1px oklch(100% 0 0 / 10%), 0px 4px 4px -2px oklch(0% 0 0 / 5%),
-      0px 2px 2px -1px oklch(0% 0 0 / 5%), 0px 1px 1px -0.5px oklch(0% 0 0 / 5%),
-      inset 0px -1.5px 1.5px -1.5px oklch(0% 0 0 / 5%),
-      inset 0px 3px 3px -1.5px oklch(100% 0 0 / 10%);
-    --shadow-bevel-md:
-      0px 0px 0px 1px oklch(100% 0 0 / 10%), 0px 6px 6px -3px oklch(0% 0 0 / 5%),
-      0px 4px 4px -1px oklch(0% 0 0 / 5%), 0px 2px 2px -1px oklch(0% 0 0 / 5%),
-      0px 1px 1px -0.5px oklch(0% 0 0 / 5%), inset 0px -1.5px 1.5px -1.5px oklch(0% 0 0 / 5%),
-      inset 0px 3px 3px -1.5px oklch(100% 0 0 / 10%);
-    --shadow-bevel-lg:
-      0px 0px 0px 1px oklch(100% 0 0 / 10%), 0px 12px 12px -6px oklch(0% 0 0 / 10%),
-      0px 6px 6px -1.5px oklch(0% 0 0 / 5%), 0px 4px 4px 0px oklch(0% 0 0 / 5%),
-      0px 2px 2px -1px oklch(0% 0 0 / 5%), 0px 1px 1px -0.5px oklch(0% 0 0 / 5%),
-      inset 0px -1.5px 1.5px -1.5px oklch(0% 0 0 / 5%),
-      inset 0px 3px 3px -1.5px oklch(100% 0 0 / 10%);
-    --shadow-bevel-xl:
-      0px 0px 0px 1px oklch(100% 0 0 / 10%), 0px 24px 24px -22px oklch(0% 0 0 / 10%),
-      0px 12px 12px -8px oklch(0% 0 0 / 10%), 0px 6px 6px -3px oklch(0% 0 0 / 5%),
-      0px 4px 4px 2px oklch(0% 0 0 / 5%), 0px 2px 2px -1px oklch(0% 0 0 / 5%),
-      0px 1px 1px -0.5px oklch(0% 0 0 / 5%), inset 0px -1.5px 1.5px -1.5px oklch(0% 0 0 / 5%),
-      inset 0px 3px 3px -1.5px oklch(100% 0 0 / 10%);
-    --shadow-bevel-2xl:
-      0px 0px 0px 1px oklch(100% 0 0 / 10%), 0px 40px 40px -28px oklch(0% 0 0 / 10%),
-      0px 24px 24px -28px oklch(0% 0 0 / 10%), 0px 12px 12px -8px oklch(0% 0 0 / 10%),
-      0px 6px 6px -3px oklch(0% 0 0 / 5%), 0px 4px 4px 2px oklch(0% 0 0 / 5%),
-      0px 2px 2px -1px oklch(0% 0 0 / 5%), 0px 1px 1px -0.5px oklch(0% 0 0 / 5%),
-      inset 0px -1.5px 1.5px -1.5px oklch(0% 0 0 / 5%),
-      inset 0px 3px 3px -1.5px oklch(100% 0 0 / 10%);
+  /* Surfaces: hairline border plus a soft lift */
+  --shadow-bevel-xs: 0 0 0 1px #2a2a2f;
+  --shadow-bevel-sm: 0 0 0 1px #2a2a2f, 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-bevel-md: 0 0 0 1px #2a2a2f, 0 4px 12px -6px rgb(0 0 0 / 0.5);
+  --shadow-bevel-lg: 0 0 0 1px #2a2a2f, 0 12px 24px -12px rgb(0 0 0 / 0.6);
+  --shadow-bevel-xl: 0 0 0 1px #2a2a2f, 0 24px 40px -20px rgb(0 0 0 / 0.7);
+  --shadow-bevel-2xl: 0 0 0 1px #2a2a2f, 0 40px 64px -28px rgb(0 0 0 / 0.75);
 
-    /* Button Shadows */
-    --shadow-button-resting:
-      0px 0px 0px 1px oklch(100% 0 0 / 5%), 0px 2px 2px -1px oklch(100% 0 0 / 10%),
-      0px 1px 1px -0.5px oklch(100% 0 0 / 10%), 0px 2px 4px -2px oklch(100% 0 0 / 10%),
-      0px 4px 8px -2px oklch(100% 0 0 / 10%), 0px 8px 12px -8px oklch(100% 0 0 / 10%),
-      inset 0px -2px 2px -1px oklch(100% 0 0 / 50%), inset 0px 2px 2px -1px oklch(0% 0 0 / 20%);
-    --shadow-button-hover:
-      0px 0px 0px 1px oklch(100% 0 0 / 15%), 0px 2px 2px -1px oklch(100% 0 0 / 10%),
-      0px 1px 1px -0.5px oklch(100% 0 0 / 10%), 0px 2px 4px -2px oklch(100% 0 0 / 10%),
-      0px 4px 8px -2px oklch(100% 0 0 / 10%), 0px 8px 12px -8px oklch(100% 0 0 / 10%),
-      inset 0px -2px 2px -1px oklch(100% 0 0 / 50%), inset 0px 2px 2px -1px oklch(0% 0 0 / 20%);
-    --shadow-button-destructive-resting:
-      0px 0px 0px 1px oklch(51.17% 0.1823 30.25 / 5%),
-      0px 2px 2px -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 1px 1px -0.5px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 2px 4px -2px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 4px 8px -2px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 8px 12px -8px oklch(51.17% 0.1823 30.25 / 10%),
-      inset 0px -2px 2px -1px oklch(51.17% 0.1823 30.25 / 20%),
-      inset 0px 4px 2px -2px oklch(0% 0 0 / 15%);
-    --shadow-button-destructive-hover:
-      0px 0px 0px 1px oklch(51.17% 0.1823 30.25 / 15%),
-      0px 2px 2px -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 1px 1px -0.5px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 2px 4px -2px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 4px 8px -2px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 8px 12px -8px oklch(51.17% 0.1823 30.25 / 10%),
-      inset 0px -2px 2px -1px oklch(51.17% 0.1823 30.25 / 20%),
-      inset 0px 4px 2px -2px oklch(0% 0 0 / 15%);
-    --shadow-button-outlined-resting:
-      0px 0px 0px 1px oklch(100% 0 0 / 5%), 0px 2px 2px -1px oklch(100% 0 0 / 10%),
-      0px 1px 1px -0.5px oklch(100% 0 0 / 10%), 0px 2px 4px -2px oklch(100% 0 0 / 10%),
-      0px 4px 8px -2px oklch(100% 0 0 / 10%), inset 0px -2px 2px -1px oklch(100% 0 0 / 20%),
-      inset 0px 4px 2px -2px oklch(0% 0 0 / 15%);
-    --shadow-button-outlined-hover:
-      0px 0px 0px 1px oklch(100% 0 0 / 15%), 0px 2px 2px -1px oklch(100% 0 0 / 10%),
-      0px 1px 1px -0.5px oklch(100% 0 0 / 10%), 0px 2px 4px -2px oklch(100% 0 0 / 10%),
-      0px 4px 8px -2px oklch(100% 0 0 / 10%), inset 0px -2px 2px -1px oklch(100% 0 0 / 20%),
-      inset 0px 4px 2px -2px oklch(0% 0 0 / 15%);
+  /* Buttons: light ink on dark */
+  --shadow-button-resting: 0 0 0 1px #f4f4f1, 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-button-hover: 0 0 0 1px #ffffff, 0 2px 6px -1px rgb(0 0 0 / 0.5);
+  --shadow-button-destructive-resting: 0 0 0 1px rgb(252 165 165 / 0.25);
+  --shadow-button-destructive-hover: 0 0 0 1px rgb(252 165 165 / 0.4);
+  --shadow-button-destructive-focus: 0 0 0 1px rgb(252 165 165 / 0.5), 0 0 0 4px rgb(252 165 165 / 0.15);
+  --shadow-button-outlined-resting: 0 0 0 1px #34343a;
+  --shadow-button-outlined-hover: 0 0 0 1px #4a4a52;
 
-    /* Input Shadows */
-    --shadow-input-resting:
-      0 0 0 1px oklch(100% 0 0 / 10%), 0px 0.5px 0px -0.5px oklch(100% 0 0 / 10%),
-      0 1px 0 -1px oklch(100% 0 0 / 10%), 0px 1px 1px -1px oklch(100% 0 0 / 10%),
-      0px 1px 2px -1px oklch(100% 0 0 / 10%), 0px 2px 4px -2px oklch(100% 0 0 / 10%),
-      0 4px 6px -8px oklch(100% 0 0 / 10%), 0 6px 6px -12px oklch(100% 0 0 / 10%);
-    --shadow-input-hover:
-      0px 0px 0px 1px oklch(100% 0 0 / 20%), 0px 0.5px 0px -0.5px oklch(100% 0 0 / 10%),
-      0 1px 0 -1px oklch(100% 0 0 / 10%), 0px 1px 1px -1px oklch(100% 0 0 / 10%),
-      0px 1px 2px -1px oklch(100% 0 0 / 10%), 0px 2px 4px -2px oklch(100% 0 0 / 10%),
-      0 4px 6px -8px oklch(100% 0 0 / 10%), 0 6px 6px -12px oklch(100% 0 0 / 10%);
-    --shadow-input-focus:
-      0px 0px 0px 1px oklch(100% 0 0 / 25%), 0px 0.5px 0px -0.5px oklch(100% 0 0 / 10%),
-      0 1px 0 -1px oklch(100% 0 0 / 10%), 0px 1px 1px -1px oklch(100% 0 0 / 10%),
-      0px 1px 2px -1px oklch(100% 0 0 / 10%), 0px 2px 4px -2px oklch(100% 0 0 / 10%),
-      0 4px 6px -8px oklch(100% 0 0 / 10%);
-    --shadow-input-destructive-resting:
-      0px 0px 0px 1px oklch(51.17% 0.1823 30.25 / 15%),
-      0px 0.5px 0px -0.5px oklch(51.17% 0.1823 30.25 / 50%),
-      0 1px 0 -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 1px 1px -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 1px 2px -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 2px 4px -2px oklch(51.17% 0.1823 30.25 / 10%),
-      0 4px 6px -8px oklch(51.17% 0.1823 30.25 / 10%);
-    --shadow-input-destructive-hover:
-      0px 0px 0px 1px oklch(51.17% 0.1823 30.25 / 25%),
-      0px 0.5px 0px -0.5px oklch(51.17% 0.1823 30.25 / 10%),
-      0 1px 0 -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 1px 1px -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 1px 2px -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 2px 4px -2px oklch(51.17% 0.1823 30.25 / 10%),
-      0 4px 6px -8px oklch(51.17% 0.1823 30.25 / 10%);
-    --shadow-input-destructive-focus:
-      0px 0px 0px 1px oklch(51.17% 0.1823 30.25 / 25%),
-      0px 0.5px 0px -0.5px oklch(51.17% 0.1823 30.25 / 10%),
-      0 1px 0 -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 1px 1px -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 1px 2px -1px oklch(51.17% 0.1823 30.25 / 10%),
-      0px 2px 4px -2px oklch(51.17% 0.1823 30.25 / 10%),
-      0 4px 6px -8px oklch(51.17% 0.1823 30.25 / 10%);
+  /* Inputs: hairline border, cyan focus ring */
+  --shadow-input-resting: 0 0 0 1px #34343a;
+  --shadow-input-hover: 0 0 0 1px #4a4a52;
+  --shadow-input-focus: 0 0 0 1px #22c3f0, 0 0 0 4px rgb(34 195 240 / 0.2);
+  --shadow-input-destructive-resting: 0 0 0 1px rgb(252 165 165 / 0.45);
+  --shadow-input-destructive-hover: 0 0 0 1px rgb(252 165 165 / 0.6);
+  --shadow-input-destructive-focus: 0 0 0 1px #fca5a5, 0 0 0 4px rgb(252 165 165 / 0.15);
 
-    /* Checkbox Shadows */
-    --shadow-checkbox-resting:
-      0px 0.5px 0px -0.5px oklch(100% 0 0 / 10%), 0 1px 0 -1px oklch(100% 0 0 / 10%),
-      0px 1px 1px -1px oklch(100% 0 0 / 10%), 0px 1px 2px -1px oklch(100% 0 0 / 10%),
-      0px 2px 4px -2px oklch(100% 0 0 / 10%), 0 4px 6px -8px oklch(100% 0 0 / 10%),
-      inset 0px -1px 2px -1px oklch(100% 0 0 / 20%), inset 0px 2px 1px -1px oklch(0% 0 0 / 50%);
-    --shadow-checkbox-hover:
-      0px 0.5px 0px -0.5px oklch(100% 0 0 / 10%), 0 1px 0 -1px oklch(100% 0 0 / 10%),
-      0px 1px 1px -1px oklch(100% 0 0 / 10%), 0px 1px 2px -1px oklch(100% 0 0 / 10%),
-      0px 2px 4px -2px oklch(100% 0 0 / 10%), 0 4px 6px -8px oklch(100% 0 0 / 10%),
-      0 8px 12px -8px oklch(100% 0 0 / 10%), inset 0px -1px 2px -1px oklch(100% 0 0 / 20%),
-      inset 0px 2px 1px -1px oklch(0% 0 0 / 50%);
-
-    /* Switch Shadows */
-    --shadow-switch-resting:
-      0 0 0 1px oklch(100% 0 0 / 5%), inset 0px 0.5px 1px 0.5px oklch(100% 0 0 / 10%);
-    --shadow-switch-hover:
-      0px 0px 0px 1px oklch(100% 0 0 / 10%), inset 0px 1px 1px 0.5px oklch(100% 0 0 / 10%);
-    --shadow-switch-focus:
-      0px 0px 0px 1px oklch(100% 0 0 / 10%), 0px 0px 0px 1px oklch(100% 0 0 / 10%),
-      inset 0px 1px 1px 0.5px oklch(100% 0 0 / 10%);
-    --shadow-switch-thumb:
-      0px 0.5px 0px -0.5px oklch(100% 0 0 / 10%), 0 1px 0 -1px oklch(100% 0 0 / 10%),
-      0px 2px 2px -1px oklch(100% 0 0 / 10%), 0px 2px 4px -2px oklch(100% 0 0 / 10%),
-      inset 0 -2px 4px -2px oklch(0% 0 0), inset 0px 0.5px 0.5px oklch(0% 0 0 / 10%);
+  /* Checkbox & switch */
+  --shadow-checkbox-resting: 0 0 0 1px #4a4a52;
+  --shadow-checkbox-hover: 0 0 0 1px #6a6a74;
+  --shadow-switch-resting: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  --shadow-switch-hover: inset 0 0 0 1px rgb(255 255 255 / 0.14);
+  --shadow-switch-focus: 0 0 0 4px rgb(34 195 240 / 0.2);
+  --shadow-switch-thumb: 0 1px 2px rgb(0 0 0 / 0.5);
 
   --color-white: oklch(100% 0 0);
   --color-black: oklch(0% 0 0);

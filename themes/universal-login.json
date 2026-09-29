@@ -1,43 +1,43 @@
 {
   "colors": {
-    "primary_button": "#0a0a0a",
+    "primary_button": "#14120b",
     "primary_button_label": "#ffffff",
-    "secondary_button_border": "#a3a3a3",
-    "secondary_button_label": "#0a0a0a",
-    "base_focus_color": "#0a0a0a",
-    "base_hover_color": "#0a0a0a",
-    "links_focused_components": "#0a0a0a",
-    "header": "#0a0a0a",
-    "body_text": "#a3a3a3",
-    "widget_background": "#ffffff",
-    "widget_border": "#0a0a0a",
-    "input_labels_placeholders": "#a3a3a3",
-    "input_filled_text": "#0a0a0a",
-    "input_border": "#262626",
+    "secondary_button_border": "#d9dae5",
+    "secondary_button_label": "#14120b",
+    "base_focus_color": "#00ade4",
+    "base_hover_color": "#2b2820",
+    "links_focused_components": "#0278d5",
+    "header": "#14120b",
+    "body_text": "#5b5e69",
+    "widget_background": "#e6ecf2",
+    "widget_border": "#d8dfe8",
+    "input_labels_placeholders": "#6b6e79",
+    "input_filled_text": "#14120b",
+    "input_border": "#d9dae5",
     "input_background": "#ffffff",
-    "icons": "#a3a3a3",
-    "error": "#d03c38",
-    "success": "#13a688",
+    "icons": "#6b6e79",
+    "error": "#b91c1c",
+    "success": "#2d8a5e",
     "captcha_widget_theme": "light"
   },
   "fonts": {
-    "font_url": "",
+    "font_url": "https://cdn.jsdelivr.net/npm/@fontsource/geist-sans@5/files/geist-sans-latin-400-normal.woff",
     "reference_text_size": 16,
     "title": {
-      "bold": true,
+      "bold": false,
       "size": 150
     },
     "subtitle": {
       "bold": false,
-      "size": 87.5
+      "size": 93.75
     },
     "body_text": {
       "bold": false,
       "size": 87.5
     },
     "buttons_text": {
-      "bold": false,
-      "size": 100
+      "bold": true,
+      "size": 93.75
     },
     "input_labels": {
       "bold": false,
@@ -47,21 +47,21 @@
       "bold": false,
       "size": 87.5
     },
-    "links_style": "underlined"
+    "links_style": "normal"
   },
   "borders": {
     "button_border_weight": 1,
     "buttons_style": "rounded",
-    "button_border_radius": 8,
+    "button_border_radius": 6,
     "input_border_weight": 1,
     "inputs_style": "rounded",
-    "input_border_radius": 10,
-    "widget_corner_radius": 24,
-    "widget_border_weight": 0,
+    "input_border_radius": 6,
+    "widget_corner_radius": 12,
+    "widget_border_weight": 1,
     "show_widget_shadow": false
   },
   "widget": {
-    "logo_position": "center",
+    "logo_position": "none",
     "logo_url": "",
     "logo_height": 52,
     "header_text_alignment": "center",
@@ -69,7 +69,7 @@
   },
   "page_background": {
     "page_layout": "center",
-    "background_color": "#0a0a0a",
+    "background_color": "#f1f1f2",
     "background_image_url": ""
   }
 }

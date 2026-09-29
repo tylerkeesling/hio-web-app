@@ -5,8 +5,8 @@ interface PageHeaderProps {
 
 export const PageHeader = ({ title, description }: PageHeaderProps) => {
   return (
-    <div className="flex flex-col gap-1 p-6">
-      <h3 className="text-3xl font-semibold">{title}</h3>
+    <div className="flex flex-col gap-2 px-6 pt-6 pb-2">
+      <h1 className="font-display text-3xl sm:text-4xl">{title}</h1>
       <p className="text-muted-foreground">{description}</p>
     </div>
   )

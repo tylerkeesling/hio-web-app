@@ -5,8 +5,10 @@ import { Auth0Provider } from "@auth0/nextjs-auth0"
 import { SettingsIcon } from "lucide-react"
 
 import { appClient, managementClient } from "@/lib/auth0"
+import { brand } from "@/lib/brand"
 import { Button } from "@/components/ui/button"
-import { Auth0Logo } from "@/components/auth0-logo"
+import { BrandLogo, BrandMark } from "@/components/brand-logo"
+import { DashboardNav } from "@/components/dashboard-nav"
 import { ModeToggle } from "@/components/mode-toggle"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
 import { UserNav } from "@/components/user-nav"
@@ -34,70 +36,73 @@ export default async function DashboardLayout({
 
   return (
     <ClientProvider>
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-2 py-4 sm:px-8">
-        <div className="flex items-center space-x-6">
-          <OrganizationSwitcher
-            organizations={orgs.map((o) => ({
-              id: o.id,
-              slug: o.name,
-              displayName: o.display_name!,
-              logoUrl: o.branding?.logo_url,
-            }))}
-            currentOrgId={session.user.org_id!}
-          />
-
-          <Link
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Home
-          </Link>
-        </div>
-
-        <div className="flex flex-row gap-x-4">
-          <Button variant="ghost" asChild className="px-2 py-2">
-            <Link href="/dashboard/organization/general">
-              <SettingsIcon className="h-[1.2rem] w-[1.2rem]" />
-            </Link>
-          </Button>
-          <UserNav />
-        </div>
-      </nav>
-
-      <main className="mx-auto grid min-h-[calc(100svh-164px)] max-w-7xl px-2 sm:px-8 lg:py-6">
-        {children}
-      </main>
-
-      <footer className="mx-auto max-w-7xl px-2 py-6 sm:px-6 lg:px-8">
-        <div className="flex justify-between">
-          <div className="flex items-center space-x-2">
-            <Auth0Logo className="h-6 w-6" />
-
-            <div className="font-mono font-semibold">
-              <Link href="/">SaaStart</Link>
+      <div className="bg-background flex min-h-screen flex-col">
+        <header className="bg-card/85 sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)] backdrop-blur-md">
+          <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+            <div className="flex min-w-0 items-center gap-3">
+              <Link href="/dashboard" aria-label="Dashboard home">
+                <BrandMark />
+              </Link>
+              <span
+                aria-hidden="true"
+                className="bg-border h-5 w-px rotate-12"
+              />
+              <OrganizationSwitcher
+                organizations={orgs.map((o) => ({
+                  id: o.id,
+                  slug: o.name,
+                  displayName: o.display_name!,
+                  logoUrl: o.branding?.logo_url,
+                }))}
+                currentOrgId={session.user.org_id!}
+              />
+              <DashboardNav className="ml-3 hidden md:flex" />
             </div>
 
-            <div>
-              <Button variant="link" asChild>
-                <Link href="/">Home</Link>
-              </Button>
-
-              <Button variant="link" asChild>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" asChild className="md:hidden">
                 <Link
-                  href="https://github.com/auth0-developer-hub/auth0-b2b-saas-starter"
-                  target="_blank"
+                  href="/dashboard/organization/general"
+                  aria-label="Organization settings"
                 >
-                  Source
+                  <SettingsIcon className="size-[1.1rem]" />
                 </Link>
               </Button>
+              <ModeToggle />
+              <UserNav />
             </div>
           </div>
+        </header>
 
-          <div className="items-center gap-x-2">
-            <ModeToggle />
+        <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+          {children}
+        </main>
+
+        <footer className="border-t">
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-6 sm:px-6 lg:px-8">
+            <Link href="/" aria-label="Home">
+              <BrandLogo
+                markClassName="size-5"
+                className="[&>span:last-child]:text-base"
+              />
+            </Link>
+            <div className="text-muted-foreground flex items-center gap-6 text-sm">
+              <Link href="/" className="hover:text-foreground">
+                Home
+              </Link>
+              <Link href="/terms" className="hover:text-foreground">
+                Terms
+              </Link>
+              <Link href="/privacy" className="hover:text-foreground">
+                Privacy
+              </Link>
+              <span className="font-mono text-xs">
+                © {new Date().getFullYear()} {brand.name}
+              </span>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </ClientProvider>
   )
 }

@@ -28,7 +28,7 @@ export function CreateOrganizationForm() {
         }
       }}
     >
-      <div className="grid gap-4">
+      <div className="grid gap-5">
         <div className="grid gap-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -54,11 +54,13 @@ export function CreateOrganizationForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <p className="text-sm text-muted-foreground">
-            Slug: <Code>{slugify(name || "Acme Corp")}</Code>
+          <p className="text-muted-foreground text-xs">
+            Workspace URL slug: <Code>{slugify(name || "Acme Corp")}</Code>
           </p>
         </div>
-        <SubmitButton>Create Organization</SubmitButton>
+        <SubmitButton size="lg" className="w-full">
+          Create organization
+        </SubmitButton>
       </div>
     </form>
   )

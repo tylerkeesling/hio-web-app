@@ -7,7 +7,7 @@ export default async function ErrorLayout({
 }>) {
   return (
     <Suspense>
-      <main className="flex min-h-screen items-center">{children}</main>
+      <main className="min-h-screen">{children}</main>
     </Suspense>
   )
 }

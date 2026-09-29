@@ -1,0 +1,7 @@
+{
+  "signup-id": {
+    "pageTitle": "Sign up | ${companyName}",
+    "title": "Create your account",
+    "description": "Start shipping with ${companyName}. It only takes a minute."
+  }
+}

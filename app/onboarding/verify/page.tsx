@@ -1,34 +1,26 @@
 "use client"
 
-import { EnvelopeClosedIcon } from "@radix-ui/react-icons"
+import { MailCheckIcon } from "lucide-react"
 import { toast } from "sonner"
 
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { AuthShell } from "@/components/auth-shell"
 import { SubmitButton } from "@/components/submit-button"
 
 import { resendVerificationEmail } from "./actions"
 
 export default function Verify() {
   return (
-    <Card className="mx-auto max-w-sm">
-      <CardHeader>
-        <CardTitle className="grid gap-2">
-          <EnvelopeClosedIcon className="size-5" />
-          <span>Verify your e-mail</span>
-        </CardTitle>
-        <CardDescription>
-          Please check your inbox for a verification link to continue creating
-          your account.
-        </CardDescription>
-      </CardHeader>
-      <CardFooter>
+    <AuthShell
+      title="Check your inbox"
+      description="We sent a verification link to your email. Open it to continue creating your account."
+      footer="Didn't get it? Check your spam folder, or resend the link above."
+    >
+      <div className="flex flex-col items-center gap-6">
+        <span className="bg-card grid size-14 place-items-center rounded-xl border shadow-[0_1px_2px_rgb(20_18_11/0.04)]">
+          <MailCheckIcon className="text-brand-blue size-6" />
+        </span>
         <form
+          className="w-full"
           action={async () => {
             const { error } = await resendVerificationEmail()
 
@@ -42,9 +34,11 @@ export default function Verify() {
             )
           }}
         >
-          <SubmitButton>Resend Verification</SubmitButton>
+          <SubmitButton variant="outline" size="lg" className="w-full">
+            Resend verification email
+          </SubmitButton>
         </form>
-      </CardFooter>
-    </Card>
+      </div>
+    </AuthShell>
   )
 }

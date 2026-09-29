@@ -2,19 +2,27 @@ import type { Metadata } from "next"
 
 import "./globals.css"
 
-import { Inter } from "next/font/google"
+import { Geist, Geist_Mono, Newsreader } from "next/font/google"
 import Script from "next/script"
 
+import { brand } from "@/lib/brand"
+import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 
-const inter = Inter({ subsets: ["latin"] })
+const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" })
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+})
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+})
 
 export const metadata: Metadata = {
-  title: "SaaStart | Auth0 by Okta",
-  description:
-    "SaaStart is a reference B2B SaaS application built using Next.js and Auth0 by Okta.",
-  metadataBase: new URL("https://saastart.app"),
+  title: `${brand.name} | ${brand.tagline}`,
+  description: brand.description,
 }
 
 export default async function RootLayout({
@@ -23,8 +31,19 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={inter.className} suppressHydrationWarning>
-      <body className="min-h-screen bg-background font-sans antialiased" suppressHydrationWarning>
+    <html
+      lang="en"
+      className={cn(
+        geistSans.variable,
+        geistMono.variable,
+        newsreader.variable
+      )}
+      suppressHydrationWarning
+    >
+      <body
+        className="bg-background text-foreground min-h-screen font-sans antialiased"
+        suppressHydrationWarning
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

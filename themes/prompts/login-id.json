@@ -1,0 +1,7 @@
+{
+  "login-id": {
+    "pageTitle": "Sign in | ${companyName}",
+    "title": "Sign in",
+    "description": "Welcome back. Use your work email to continue to ${companyName}."
+  }
+}

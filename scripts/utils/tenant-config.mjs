@@ -17,7 +17,7 @@ export async function checkTenantSettingsChanges() {
   const desiredSettings = {
     customize_mfa_in_postlogin_action: true,
     flags: { enable_client_connections: false },
-    friendly_name: "SaaStart",
+    friendly_name: "Belay",
     picture_url: "https://cdn.auth0.com/blog/auth0_by_okta_logo_black.png",
   }
 
@@ -238,6 +238,21 @@ export async function applyPromptSettingsChanges(changePlan) {
 }
 
 /**
+ * Tenants created on or after May 5, 2026 on a non-enterprise plan cannot set
+ * resultUrl on email templates; the Management API rejects it with a 403.
+ * https://auth0.com/docs/customize/email/email-templates/customize-email-templates
+ */
+function isResultUrlNotAllowedError(e) {
+  return (
+    e.message &&
+    e.message.includes("Customizations for resultUrl are not allowed")
+  )
+}
+
+const RESULT_URL_NOT_ALLOWED_WARNING =
+  "Skipped email verification template: this tenant's plan does not allow customizing resultUrl (Redirect To)"
+
+/**
  * Apply Email Templates changes
  */
 export async function applyEmailTemplatesChanges(changePlan) {
@@ -273,6 +288,10 @@ export async function applyEmailTemplatesChanges(changePlan) {
       await $`auth0 ${updateArgs}`
       spinner.succeed("Updated email verification template")
     } catch (e) {
+      if (isResultUrlNotAllowedError(e)) {
+        spinner.warn(RESULT_URL_NOT_ALLOWED_WARNING)
+        return
+      }
       spinner.fail(`Failed to update email verification template`)
       throw e
     }
@@ -302,6 +321,8 @@ export async function applyEmailTemplatesChanges(changePlan) {
       // Template creation might fail if it already exists
       if (e.message && e.message.includes("already exists")) {
         spinner.succeed("Email verification template already configured")
+      } else if (isResultUrlNotAllowedError(e)) {
+        spinner.warn(RESULT_URL_NOT_ALLOWED_WARNING)
       } else {
         spinner.fail(`Failed to create email verification template`)
         throw e

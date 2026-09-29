@@ -26,5 +26,8 @@ declare namespace NodeJS {
 
     // The namespace used to prefix custom claims
     CUSTOM_CLAIMS_NAMESPACE: string
+
+    // Set to "false" to skip the onboarding email verification step (default: required)
+    REQUIRE_EMAIL_VERIFICATION?: string
   }
 }

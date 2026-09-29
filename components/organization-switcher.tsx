@@ -66,27 +66,27 @@ export function OrganizationSwitcher({
           aria-label="Select an organization"
           disabled={isPending}
           className={cn(
-            "flex h-12 w-full min-w-[240px] justify-between rounded-xl border border-border bg-field p-2",
-            "hover:border-accent hover:bg-accent/15",
-            isPending && "opacity-50 cursor-not-allowed"
+            "flex h-9 max-w-[260px] min-w-0 justify-between gap-2 border-transparent bg-transparent px-2 shadow-none",
+            "hover:border-field-border hover:bg-card",
+            isPending && "cursor-not-allowed opacity-50"
           )}
         >
-          <Avatar className="mr-2 size-8 rounded-sm">
+          <Avatar className="size-6 rounded-md">
             <AvatarImage
               src={organization.logoUrl}
               alt={organization.displayName}
             />
-            <AvatarFallback className="rounded-sm">
+            <AvatarFallback className="bg-brand-soft text-brand-ink rounded-md text-xs font-medium">
               {organization.displayName[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <span className="min-w-16 truncate text-left">
+          <span className="min-w-12 truncate text-left font-medium">
             {organization.displayName}
           </span>
-          <CaretSortIcon className="ml-auto h-4 w-4 shrink-0 opacity-50" />
+          <CaretSortIcon className="ml-auto size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[240px] rounded-xl p-0">
+      <PopoverContent align="start" className="w-[260px] rounded-lg p-0">
         <Command>
           <CommandList>
             <CommandInput placeholder="Search organizations..." />
@@ -99,9 +99,9 @@ export function OrganizationSwitcher({
                   onSelect={() => handleSwitch(org.id)}
                   className="text-sm"
                 >
-                  <Avatar className="mr-2 size-8 rounded-sm">
+                  <Avatar className="mr-2 size-6 rounded-md">
                     <AvatarImage src={org.logoUrl} alt={org.displayName} />
-                    <AvatarFallback className="rounded-sm">
+                    <AvatarFallback className="bg-brand-soft text-brand-ink rounded-md text-xs font-medium">
                       {org.displayName[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>

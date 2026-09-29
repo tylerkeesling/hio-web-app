@@ -51,28 +51,33 @@ export default async function AccountLayout({ children }: AccountLayoutProps) {
 
   if (getRole(session.user) !== "admin") {
     return (
-      <div className="flex items-center justify-center">
-        <Card className="w-[450px]">
-          <CardHeader>
-            <CardTitle>Unauthorized</CardTitle>
-            <CardDescription className="space-y-1.5">
-              <p>
-                You’re currently logged in with the role of{" "}
-                <span className="font-semibold">{getRole(session.user)}</span>.
-              </p>
-              <p>
-                Log in as an Organization member with the{" "}
-                <span className="font-semibold">admin</span> role to manage your
-                Organization&apos;s settings.
-              </p>
+      <div className="flex flex-1 items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-3">
+            <p className="eyebrow">Admins only</p>
+            <CardTitle className="font-display text-3xl font-normal">
+              You need admin access
+            </CardTitle>
+            <CardDescription className="space-y-1.5 text-sm">
+              <span className="block">
+                You&apos;re signed in with the{" "}
+                <span className="text-foreground font-medium">
+                  {getRole(session.user)}
+                </span>{" "}
+                role.
+              </span>
+              <span className="block">
+                Ask an organization admin to change your role, or sign in as an
+                admin to manage these settings.
+              </span>
             </CardDescription>
           </CardHeader>
           <CardFooter>
-            <Link href="/dashboard" className="w-full">
-              <Button className="w-full">
-                <ArrowLeftIcon className="mr-2 h-4 w-4" /> Go Back to Home
-              </Button>
-            </Link>
+            <Button className="w-full" asChild>
+              <Link href="/dashboard">
+                <ArrowLeftIcon className="size-4" /> Back to overview
+              </Link>
+            </Button>
           </CardFooter>
         </Card>
       </div>
@@ -80,14 +85,13 @@ export default async function AccountLayout({ children }: AccountLayoutProps) {
   }
 
   return (
-    <div className="space-y-1">
-      <div className="flex min-h-full flex-col space-y-8 lg:flex-row lg:space-x-4 lg:space-y-0">
-        <aside className="lg:w-1/5">
-          <SidebarNav items={sidebarNavItems} />
-        </aside>
-        <div className="rounded-2xl border border-border bg-field p-2 shadow-sm lg:w-4/5">
-          <div className="mx-auto max-w-6xl">{children}</div>
-        </div>
+    <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
+      <aside className="lg:pt-6">
+        <p className="eyebrow mb-3 hidden px-3 lg:block">Organization</p>
+        <SidebarNav items={sidebarNavItems} />
+      </aside>
+      <div className="bg-card min-w-0 rounded-xl border p-2 shadow-[0_1px_2px_rgb(20_18_11/0.04)]">
+        <div className="mx-auto max-w-6xl">{children}</div>
       </div>
     </div>
   )

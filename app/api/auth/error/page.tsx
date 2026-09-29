@@ -2,36 +2,25 @@
 
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
-import { ArrowRightIcon } from "@radix-ui/react-icons"
+import { ArrowRightIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { AuthShell } from "@/components/auth-shell"
 
 export default function SearchBar() {
   const searchParams = useSearchParams()
   const error = searchParams.get("error")
 
   return (
-    <div className="mx-auto max-w-sm">
-      <Card className="w-[450px]">
-        <CardHeader>
-          <CardTitle>Unauthorized</CardTitle>
-          <CardDescription>{error}</CardDescription>
-        </CardHeader>
-        <CardFooter>
-          <Link href="/" className="w-full">
-            <Button className="w-full">
-              Go to Homepage <ArrowRightIcon className="ml-2 size-4" />
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-    </div>
+    <AuthShell
+      title="Something went wrong"
+      description={error || "We couldn't sign you in. Please try again."}
+    >
+      <Button size="lg" className="w-full" asChild>
+        <Link href="/">
+          Back to homepage <ArrowRightIcon className="size-4" />
+        </Link>
+      </Button>
+    </AuthShell>
   )
 }

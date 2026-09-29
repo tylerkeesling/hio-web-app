@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+  <head>
+    <title>{{ prompt.screen.texts.pageTitle | replace: application.name, "Belay" }}</title>
+    {%- auth0:head -%}
+    <link rel="icon" type="image/svg+xml" href="__FAVICON_DATA_URI__" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono&family=Newsreader:opsz,wght@6..72,400&display=swap"
+    />
+    <style>
+      :root {
+        --bl-ink: #14120b;
+        --bl-muted: #5b5e69;
+        --bl-border: #e3e4ea;
+        --bl-canvas: #f1f1f2;
+        /* Shared by the brand panel and the login widget (theme widget_background) */
+        --bl-panel: #e6ecf2;
+        --bl-dot: #d3d7de;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: var(--bl-canvas);
+      }
+      .bl-shell {
+        display: grid;
+        grid-template-columns: 1fr;
+        min-height: 100vh;
+      }
+      /* Brand panel (desktop only) */
+      .bl-brand {
+        display: none;
+      }
+      @media (min-width: 1024px) {
+        .bl-shell {
+          grid-template-columns: minmax(460px, 46%) 1fr;
+        }
+        .bl-brand {
+          position: sticky;
+          top: 0;
+          box-sizing: border-box;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+          padding: 36px 56px 32px;
+          background: var(--bl-panel);
+          border-right: 1px solid var(--bl-border);
+          overflow: hidden;
+          color: var(--bl-ink);
+          font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+      }
+      .bl-logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--bl-ink);
+        font-family: "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        text-transform: lowercase;
+      }
+      .bl-logo svg {
+        width: 28px;
+        height: 28px;
+      }
+      .bl-copy {
+        margin-top: 6vh;
+      }
+      .bl-eyebrow {
+        margin: 0;
+        font-family: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--bl-muted);
+      }
+      .bl-headline {
+        margin: 20px 0 0;
+        max-width: 11em;
+        font-family: "Newsreader", Georgia, "Times New Roman", serif;
+        font-weight: 400;
+        font-size: clamp(42px, 3.6vw, 58px);
+        line-height: 1.04;
+        letter-spacing: -0.022em;
+      }
+      .bl-lede {
+        margin: 18px 0 0;
+        max-width: 30em;
+        font-size: 17px;
+        line-height: 1.6;
+        color: #3f424c;
+      }
+      /* Illustration fills whatever height is left, never overflowing */
+      .bl-art {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .bl-art svg {
+        display: block;
+        width: auto;
+        max-width: min(100%, 500px);
+        height: auto;
+        max-height: 100%;
+      }
+      .bl-legal {
+        margin: 0;
+        font-family: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
+        font-size: 12px;
+        color: var(--bl-muted);
+      }
+      /* Login column: widget on a fading dot grid */
+      .bl-main {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 32px 16px;
+        overflow: hidden;
+      }
+      .bl-main::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image: radial-gradient(circle at 1px 1px, var(--bl-dot) 1px, transparent 0);
+        background-size: 14px 14px;
+        -webkit-mask-image: radial-gradient(ellipse 80% 60% at 0% 0%, #000, transparent 70%);
+        mask-image: radial-gradient(ellipse 80% 60% at 0% 0%, #000, transparent 70%);
+      }
+      .bl-main > * {
+        position: relative;
+      }
+      .bl-main-logo {
+        display: flex;
+        justify-content: center;
+      }
+      .bl-main-logo svg {
+        width: 36px;
+        height: 36px;
+      }
+      @media (min-width: 1024px) {
+        .bl-main-logo {
+          display: none;
+        }
+      }
+      /* Phones: Auth0 renders the widget edge to edge and paints the page in the
+         widget color, so drop the card border and rounded corners there */
+      @media (max-width: 600px) {
+        :root {
+          --box-border-width: 0px !important;
+          --border-radius-outer: 0px !important;
+        }
+      }
+      /* Serif widget title, matching the app's display headings */
+      .bl-main h1 {
+        font-family: "Newsreader", Georgia, "Times New Roman", serif !important;
+        font-weight: 400 !important;
+        font-size: 34px !important;
+        line-height: 1.1 !important;
+        letter-spacing: -0.02em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bl-shell">
+      <aside class="bl-brand" aria-hidden="true">
+        <span class="bl-logo">
+          <svg viewBox="0 0 32 32" stroke-linejoin="round" stroke-width="1.2">
+            <polygon points="16,2.98 26.42,9 16,15.02 5.58,9" fill="#7fdcf7" stroke="#7fdcf7" />
+            <polygon points="4.73,10.47 15.15,16.49 15.15,28.53 4.73,22.51" fill="#0278d5" stroke="#0278d5" />
+            <polygon points="16.85,16.49 27.27,10.47 27.27,22.51 16.85,28.53" fill="#00ade4" stroke="#00ade4" />
+          </svg>
+          Belay
+        </span>
+        <div class="bl-copy">
+          <p class="bl-eyebrow">Software delivery, secured</p>
+          <h2 class="bl-headline">The safety line<br />for every release</h2>
+          <p class="bl-lede">
+            Build, test, and ship with guardrails built in, so every team moves
+            fast without falling.
+          </p>
+        </div>
+        <div class="bl-art">__HERO_CUBES_SVG__</div>
+        <p class="bl-legal">© Belay, Inc.</p>
+      </aside>
+
+      <div class="bl-main">
+        <div class="bl-main-logo" aria-hidden="true">
+          <svg viewBox="0 0 32 32" stroke-linejoin="round" stroke-width="1.2">
+            <polygon points="16,2.98 26.42,9 16,15.02 5.58,9" fill="#7fdcf7" stroke="#7fdcf7" />
+            <polygon points="4.73,10.47 15.15,16.49 15.15,28.53 4.73,22.51" fill="#0278d5" stroke="#0278d5" />
+            <polygon points="16.85,16.49 27.27,10.47 27.27,22.51 16.85,28.53" fill="#00ade4" stroke="#00ade4" />
+          </svg>
+        </div>
+        {%- auth0:widget -%}
+      </div>
+    </div>
+  </body>
+</html>

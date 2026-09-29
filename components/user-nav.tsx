@@ -19,8 +19,8 @@ export async function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-          <Avatar className="h-9 w-9">
+        <Button variant="ghost" className="relative size-8 rounded-full p-0">
+          <Avatar className="ring-border size-8 ring-1">
             <AvatarImage
               src={session?.user.picture || "/avatar.svg"}
               alt="User avatar"
@@ -40,19 +40,29 @@ export async function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">
+            <p className="text-sm leading-none font-medium">
               {session?.user.name}
             </p>
-            <p className="text-xs leading-none text-muted-foreground">
+            <p className="text-muted-foreground text-xs leading-none">
               {session?.user.email}
             </p>
           </div>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/dashboard/account/profile">Profile</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <a href="/auth/logout">Log Out</a>
+          <Link href="/dashboard/account/security">Security</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard/organization/general">
+            Organization settings
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <a href="/auth/logout">Log out</a>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

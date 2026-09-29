@@ -17,14 +17,13 @@ interface AccountLayoutProps {
 
 export default async function AccountLayout({ children }: AccountLayoutProps) {
   return (
-    <div className="space-y-1">
-      <div className="flex min-h-full flex-col space-y-8 lg:flex-row lg:space-x-4 lg:space-y-0">
-        <aside className="lg:w-1/5">
-          <SidebarNav items={sidebarNavItems} />
-        </aside>
-        <div className="rounded-2xl border border-border bg-field p-2 shadow-sm lg:w-4/5">
-          <div className="mx-auto max-w-6xl">{children}</div>
-        </div>
+    <div className="grid gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
+      <aside className="lg:pt-6">
+        <p className="eyebrow mb-3 hidden px-3 lg:block">Account</p>
+        <SidebarNav items={sidebarNavItems} />
+      </aside>
+      <div className="bg-card min-w-0 rounded-xl border p-2 shadow-[0_1px_2px_rgb(20_18_11/0.04)]">
+        <div className="mx-auto max-w-6xl">{children}</div>
       </div>
     </div>
   )

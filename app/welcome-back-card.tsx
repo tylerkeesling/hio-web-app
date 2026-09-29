@@ -3,22 +3,17 @@ import { ArrowRightIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
-export function WelcomeBackCard() {
+export function WelcomeBackCard({ name }: { name?: string }) {
   return (
-    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-      <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">Welcome Back!</h1>
-        <p className="text-sm text-muted-foreground">
-          You are currently logged in to SaaStart.
-        </p>
-      </div>
-      <div className="flex justify-center">
-        <Button asChild>
-          <Link href="/dashboard">
-            Continue to Dashboard <ArrowRightIcon className="ml-1.5 size-4" />
-          </Link>
-        </Button>
-      </div>
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+      <Button size="lg" asChild>
+        <Link href="/dashboard">
+          Continue to dashboard <ArrowRightIcon className="size-4" />
+        </Link>
+      </Button>
+      <p className="text-muted-foreground text-sm">
+        You&apos;re signed in{name ? ` as ${name}` : ""}.
+      </p>
     </div>
   )
 }

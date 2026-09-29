@@ -21,8 +21,13 @@ const config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-inter-sans)", ...defaultTheme.fontFamily.sans],
-        mono: [...defaultTheme.fontFamily.mono],
+        sans: ["var(--font-geist-sans)", ...defaultTheme.fontFamily.sans],
+        serif: [
+          "var(--font-newsreader)",
+          "Georgia",
+          ...defaultTheme.fontFamily.serif,
+        ],
+        mono: ["var(--font-geist-mono)", ...defaultTheme.fontFamily.mono],
       },
       colors: {
         field: "var(--field)",

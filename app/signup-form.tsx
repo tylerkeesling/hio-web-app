@@ -1,28 +1,21 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
+import { ArrowRightIcon } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { SubmitButton } from "@/components/submit-button"
 
 export function SignUpForm() {
   return (
-    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-      <div className="flex flex-col space-y-2 text-center">
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Try SaaStart for Free
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Enter your email address to sign up and create a new organization for you and your collaborators.
-        </p>
-      </div>
+    <div className="max-w-lg">
       <form
+        className="flex flex-col gap-2.5 sm:flex-row"
         action={async (formData: FormData) => {
           "use server"
 
           const email = formData.get("email")
           if (!email || typeof email !== "string") return
-          
+
           const searchParams = new URLSearchParams({
             login_hint: email,
             returnTo: "/onboarding/post-auth",
@@ -30,33 +23,36 @@ export function SignUpForm() {
           redirect(`/onboarding/signup?${searchParams.toString()}`)
         }}
       >
-        <div className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              name="email"
-              placeholder="name@example.com"
-              required
-            />
-          </div>
-          <SubmitButton>Get Started</SubmitButton>
-        </div>
+        <label htmlFor="email" className="sr-only">
+          Work email
+        </label>
+        <Input
+          id="email"
+          type="email"
+          name="email"
+          placeholder="you@company.com"
+          autoComplete="email"
+          required
+          className="h-11 sm:flex-1"
+        />
+        <SubmitButton size="lg">
+          Start for free <ArrowRightIcon className="size-4" />
+        </SubmitButton>
       </form>
-      <p className="px-8 text-center text-sm text-muted-foreground">
-        By continuing, you agree to our{" "}
-        <Link
-          href="/terms"
-          className="underline underline-offset-4 hover:text-primary"
+      <p className="text-muted-foreground mt-3 text-xs leading-relaxed">
+        Already on a team?{" "}
+        <a
+          href="/auth/login?returnTo=/dashboard"
+          className="text-brand-blue font-medium hover:underline"
         >
-          Terms of Service
+          Log in
+        </a>
+        . By continuing, you agree to our{" "}
+        <Link href="/terms" className="underline underline-offset-2">
+          Terms
         </Link>{" "}
         and{" "}
-        <Link
-          href="/privacy"
-          className="underline underline-offset-4 hover:text-primary"
-        >
+        <Link href="/privacy" className="underline underline-offset-2">
           Privacy Policy
         </Link>
         .

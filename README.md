@@ -188,6 +188,20 @@ Once the script has successfully completed, a `.env.local` file will be created 
 
 Now you're ready to start editing to build your own SaaS application! To see this in action, modify `app/page.tsx` in some way and save the file. The browser will hot-reload to show any changes you've made each time you save.
 
+### Optional: Apply the Universal Login branding
+
+The hosted login pages are branded to match the app (theme, page template, and login/signup text). Page templates require a [custom domain](https://auth0.com/docs/customize/custom-domains) on the tenant. To apply or re-apply the branding:
+
+```shell
+npm run auth0:branding <your-tenant-domain>
+```
+
+- Theme colors, fonts, and borders: `themes/universal-login.json` (also used by the bootstrap)
+- Page template: `themes/universal-login.liquid` (the hero illustration from `public/brand/hero-cubes.svg` is embedded at apply time)
+- Login and signup text: `themes/prompts/<prompt>.json`
+
+The product name shown in the app comes from `lib/brand.ts`; the name on the login pages comes from the tenant's friendly name (`${companyName}`).
+
 ---
 
 ## B2B Identity Features to Explore
