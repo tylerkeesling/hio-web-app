@@ -10,54 +10,12 @@ import {
 } from "lucide-react"
 
 import { appClient } from "@/lib/auth0"
+import { PipelineRun, pipelineStatus } from "@/lib/pipelines"
 import { getPlan, plans } from "@/lib/plan"
 import { getRole } from "@/lib/roles"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { PipelineMock } from "@/components/marketing/product-mocks"
-
-// Demo data: the first two rows always want a runner, so on the Free plan one
-// of them queues and on Team both run.
-const activeRuns = [
-  {
-    pipeline: "checkout-service",
-    branch: "main",
-    commit: "#4821",
-    trigger: "push by ada",
-    started: "2 min ago",
-  },
-  {
-    pipeline: "web-frontend",
-    branch: "feat/plan-badge",
-    commit: "#1077",
-    trigger: "pull request #212",
-    started: "1 min ago",
-  },
-  {
-    pipeline: "billing-worker",
-    branch: "main",
-    commit: "#390",
-    trigger: "push by sam",
-    started: "just now",
-  },
-]
-
-const finishedRuns = [
-  {
-    pipeline: "infra",
-    branch: "main",
-    commit: "#212",
-    trigger: "schedule",
-    started: "18 min ago",
-  },
-  {
-    pipeline: "checkout-service",
-    branch: "main",
-    commit: "#4820",
-    trigger: "push by priya",
-    started: "41 min ago",
-  },
-]
 
 export default async function PipelinesPage() {
   const session = await appClient.getSession()
@@ -65,12 +23,8 @@ export default async function PipelinesPage() {
   const plan = getPlan(user)
   const isAdmin = getRole(user) === "admin"
 
-  // Gate compute by the plan claim in the token: the number of runners the
-  // workspace may use at once comes straight from the plan
-  const capacity = plans[plan].runners
-  const running = activeRuns.slice(0, capacity)
-  const queued = activeRuns.slice(capacity)
-  const inUse = Math.min(activeRuns.length, capacity)
+  // Gate compute by the plan claim in the token
+  const { capacity, running, queued, finished, inUse } = pipelineStatus(plan)
 
   return (
     <div className="space-y-10">
@@ -95,7 +49,7 @@ export default async function PipelinesPage() {
               <p className="text-sm font-medium">Runs</p>
               <p className="text-muted-foreground text-xs">
                 {running.length} running · {queued.length} queued ·{" "}
-                {finishedRuns.length} finished
+                {finished.length} finished
               </p>
             </div>
             <Button size="sm" variant="outline">
@@ -119,7 +73,7 @@ export default async function PipelinesPage() {
                 {queued.map((run) => (
                   <RunRow key={run.commit} run={run} status="queued" />
                 ))}
-                {finishedRuns.map((run) => (
+                {finished.map((run) => (
                   <RunRow key={run.commit} run={run} status="passed" />
                 ))}
               </tbody>
@@ -190,7 +144,7 @@ function RunRow({
   run,
   status,
 }: {
-  run: (typeof activeRuns)[number]
+  run: PipelineRun
   status: "running" | "queued" | "passed"
 }) {
   return (

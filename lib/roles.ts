@@ -1,6 +1,6 @@
 import { User } from "@auth0/nextjs-auth0/types"
 
-const ROLES_CLAIM_KEY = `${process.env.CUSTOM_CLAIMS_NAMESPACE}/roles`
+export const ROLES_CLAIM_KEY = `${process.env.CUSTOM_CLAIMS_NAMESPACE}/roles`
 
 export const roles = {
   member: process.env.AUTH0_MEMBER_ROLE_ID,

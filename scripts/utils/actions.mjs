@@ -10,6 +10,59 @@ import { waitUntilActionIsBuilt } from "./helpers.mjs"
 export const CUSTOM_CLAIMS_NAMESPACE = "https://example.com"
 export const BELAY_PROVISIONING_ACTION_NAME = "Belay Provisioning"
 const BELAY_PROVISIONING_ACTION_FILE = "./actions/belay-provisioning.js"
+export const BLOCK_DISPOSABLE_ACTION_NAME = "Block Disposable Domains"
+const BLOCK_DISPOSABLE_ACTION_FILE = "./actions/block-disposable-domains.js"
+
+function secretPairs(secrets) {
+  return secrets.map((secret) => {
+    const separator = secret.indexOf("=")
+    return { name: secret.slice(0, separator), value: secret.slice(separator + 1) }
+  })
+}
+
+/**
+ * Compare an Action's deployed code with the file on disk
+ */
+async function checkActionCode(existingActions, name, file, resource) {
+  const existingAction = existingActions.find((a) => a.name === name)
+
+  if (!existingAction) {
+    return createChangeItem(ChangeAction.CREATE, { resource, name })
+  }
+
+  const desiredCode = await readFile(file, "utf8")
+  const currentAction = await auth0ApiCall(
+    "get",
+    `actions/actions/${existingAction.id}`
+  )
+
+  if (currentAction?.code?.trim() !== desiredCode.trim()) {
+    return createChangeItem(ChangeAction.UPDATE, {
+      resource,
+      name,
+      existing: existingAction,
+      summary: "Update code",
+    })
+  }
+
+  return createChangeItem(ChangeAction.SKIP, {
+    resource,
+    name,
+    existing: existingAction,
+  })
+}
+
+/**
+ * Check if the Block Disposable Domains Action needs changes
+ */
+export function checkBlockDisposableDomainsActionChanges(existingActions) {
+  return checkActionCode(
+    existingActions,
+    BLOCK_DISPOSABLE_ACTION_NAME,
+    BLOCK_DISPOSABLE_ACTION_FILE,
+    "Block Disposable Domains Action"
+  )
+}
 
 // ============================================================================
 // CHECK FUNCTIONS - Determine what changes are needed
@@ -315,6 +368,77 @@ async function updateAction(actionId, code, secrets, dependencies = []) {
 }
 
 /**
+ * Apply Block Disposable Domains Action changes (pre-user-registration, no secrets)
+ */
+export async function applyBlockDisposableDomainsActionChanges(changePlan) {
+  if (changePlan.action === ChangeAction.SKIP) {
+    const spinner = ora({
+      text: `Using existing ${BLOCK_DISPOSABLE_ACTION_NAME} Action without changes`,
+    }).start()
+    spinner.succeed()
+    return changePlan.existing
+  }
+
+  const code = await readFile(BLOCK_DISPOSABLE_ACTION_FILE, {
+    encoding: "utf-8",
+  })
+
+  if (changePlan.action === ChangeAction.CREATE) {
+    const spinner = ora({
+      text: `Creating ${BLOCK_DISPOSABLE_ACTION_NAME} Action`,
+    }).start()
+
+    try {
+      const action = await auth0ApiCall("post", "actions/actions", {
+        name: BLOCK_DISPOSABLE_ACTION_NAME,
+        code,
+        runtime: "node22",
+        supported_triggers: [{ id: "pre-user-registration", version: "v2" }],
+      })
+
+      await waitUntilActionIsBuilt(action.id)
+      await $`auth0 actions deploy ${action.id} --json --no-input`
+
+      spinner.succeed(`Created ${BLOCK_DISPOSABLE_ACTION_NAME} Action`)
+      return action
+    } catch (e) {
+      spinner.fail(`Failed to create the ${BLOCK_DISPOSABLE_ACTION_NAME} Action`)
+      throw e
+    }
+  }
+
+  if (changePlan.action === ChangeAction.UPDATE) {
+    await updateAction(changePlan.existing.id, code, [])
+    return changePlan.existing
+  }
+}
+
+/**
+ * Bind the Block Disposable Domains Action to the pre-user-registration trigger.
+ * The trigger has a single binding, so this is applied unconditionally.
+ */
+export async function applyPreUserRegistrationBindingsChanges(action) {
+  const spinner = ora({
+    text: `Updating pre-user-registration trigger bindings`,
+  }).start()
+
+  try {
+    await auth0ApiCall("patch", "actions/triggers/pre-user-registration/bindings", {
+      bindings: [
+        {
+          ref: { type: "action_name", value: action.name },
+          display_name: action.name,
+        },
+      ],
+    })
+    spinner.succeed("Updated pre-user-registration trigger bindings")
+  } catch (e) {
+    spinner.fail("Failed to update pre-user-registration trigger bindings")
+    throw e
+  }
+}
+
+/**
  * Apply Belay Provisioning Action changes
  * @param {object} changePlan
  * @param {{ apiUrl: string, apiKey: string }} belay - where the Action reaches the app, and the shared secret
@@ -353,13 +477,7 @@ export async function applyBelayProvisioningActionChanges(
         code,
         runtime: "node22",
         supported_triggers: [{ id: "post-login", version: "v3" }],
-        secrets: secrets.map((secret) => {
-          const separator = secret.indexOf("=")
-          return {
-            name: secret.slice(0, separator),
-            value: secret.slice(separator + 1),
-          }
-        }),
+        secrets: secretPairs(secrets),
       })
 
       await waitUntilActionIsBuilt(action.id)

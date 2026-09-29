@@ -3,8 +3,9 @@
 // (run `auth0 login` first) and read the app's configuration from .env.local.
 //
 //   npm run demo:action [-- --url https://belay.example.com]
-//       Create or update, deploy, and bind the Belay Provisioning Action. Pass
-//       the app's public URL once it is deployed; the Action cannot reach localhost.
+//       Create or update, deploy, and bind the Belay Provisioning Action (post-login)
+//       and the Block Disposable Domains Action (pre-user-registration). Pass the
+//       app's public URL once it is deployed; the Action cannot reach localhost.
 //
 //   npm run demo:bot on|off
 //       Force the bot-detection challenge on every password sign-up (on), or
@@ -23,9 +24,13 @@ import ora from "ora"
 import {
   applyActionTriggerBindingsChanges,
   applyBelayProvisioningActionChanges,
+  applyBlockDisposableDomainsActionChanges,
+  applyPreUserRegistrationBindingsChanges,
   BELAY_PROVISIONING_ACTION_NAME,
+  BLOCK_DISPOSABLE_ACTION_NAME,
   checkActionTriggerBindingsChanges,
   checkBelayProvisioningActionChanges,
+  checkBlockDisposableDomainsActionChanges,
 } from "./utils/actions.mjs"
 import { auth0ApiCall } from "./utils/auth0-api.mjs"
 import { readEnvFile, upsertEnvValue } from "./utils/env.mjs"
@@ -90,15 +95,24 @@ async function deployAction(args) {
     apiKey,
   })
 
+  // The sign-up policy Action has no secrets, so only code changes redeploy it
+  const blockAction = await applyBlockDisposableDomainsActionChanges(
+    await checkBlockDisposableDomainsActionChanges(existing)
+  )
+
   const actions = await listActions()
   const ordered = POST_LOGIN_ORDER.map((name) =>
     actions.find((a) => a.name === name)
   ).filter(Boolean)
   const bindingsPlan = await checkActionTriggerBindingsChanges(actions)
   await applyActionTriggerBindingsChanges(bindingsPlan, ordered)
+  await applyPreUserRegistrationBindingsChanges(blockAction)
 
   console.log(
-    `\n✅ ${BELAY_PROVISIONING_ACTION_NAME} (${action.id}) is deployed and calls ${apiUrl}/api/provision\n`
+    `\n✅ ${BELAY_PROVISIONING_ACTION_NAME} (${action.id}) is deployed and calls ${apiUrl}/api/provision`
+  )
+  console.log(
+    `✅ ${BLOCK_DISPOSABLE_ACTION_NAME} (${blockAction.id}) is bound to pre-user-registration\n`
   )
 }
 

@@ -6,6 +6,7 @@ import {
   checkAddDefaultRoleActionChanges,
   checkAddRoleToTokensActionChanges,
   checkBelayProvisioningActionChanges,
+  checkBlockDisposableDomainsActionChanges,
   checkSecurityPoliciesActionChanges,
 } from "./actions.mjs"
 import { auth0ApiCall } from "./auth0-api.mjs"
@@ -217,6 +218,8 @@ export async function buildChangePlan(resources, domain) {
     const memberRoleId = plan.roles.member.existing?.id || "TO_BE_CREATED"
 
     // Actions (will compare code to detect changes)
+    plan.actions.blockDisposableDomains =
+      await checkBlockDisposableDomainsActionChanges(resources.actions)
     plan.actions.belayProvisioning = await checkBelayProvisioningActionChanges(
       resources.actions
     )
@@ -288,6 +291,7 @@ export function displayChangePlan(plan) {
   categorize(plan.myAccountResourceServer)
   categorize(plan.roles.admin)
   categorize(plan.roles.member)
+  categorize(plan.actions.blockDisposableDomains)
   categorize(plan.actions.belayProvisioning)
   categorize(plan.actions.securityPolicies)
   categorize(plan.actions.addDefaultRole)

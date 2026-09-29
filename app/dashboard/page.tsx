@@ -1,215 +1,283 @@
 import Link from "next/link"
-import {
-  ArrowRightIcon,
-  FingerprintIcon,
-  GlobeLockIcon,
-  KeyRoundIcon,
-  ShieldCheckIcon,
-  UserRoundIcon,
-  UsersIcon,
-  WorkflowIcon,
-} from "lucide-react"
+import { ArrowRightIcon, CheckIcon, CircleIcon, LockIcon } from "lucide-react"
 
-import { appClient, managementClient } from "@/lib/auth0"
-import { getPlan, plans } from "@/lib/plan"
-import { getRole } from "@/lib/roles"
+import { appClient } from "@/lib/auth0"
+import { firstNameOf } from "@/lib/names"
+import { pipelineStatus } from "@/lib/pipelines"
+import { getPlan, PLAN_CLAIM_KEY, plans } from "@/lib/plan"
+import { getRole, ROLES_CLAIM_KEY } from "@/lib/roles"
+import { cn } from "@/lib/utils"
+import { getWorkspaceReadiness } from "@/lib/workspace-readiness"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
-const shortcuts = [
-  {
-    href: "/dashboard/pipelines",
-    icon: WorkflowIcon,
-    title: "Pipelines",
-    body: "Recent runs and the runners your plan includes.",
-    adminOnly: false,
-  },
-  {
-    href: "/dashboard/organization/members",
-    icon: UsersIcon,
-    title: "Members",
-    body: "Invite teammates and manage their roles.",
-    adminOnly: true,
-  },
-  {
-    href: "/dashboard/organization/sso",
-    icon: KeyRoundIcon,
-    title: "Single sign-on",
-    body: "Connect a SAML or OIDC identity provider.",
-    adminOnly: true,
-  },
-  {
-    href: "/dashboard/organization/domains",
-    icon: GlobeLockIcon,
-    title: "Domains",
-    body: "Verify the email domains your company owns.",
-    adminOnly: true,
-  },
-  {
-    href: "/dashboard/organization/security-policies",
-    icon: ShieldCheckIcon,
-    title: "Security policies",
-    body: "Require multi-factor authentication for everyone.",
-    adminOnly: true,
-  },
-  {
-    href: "/dashboard/account/security",
-    icon: FingerprintIcon,
-    title: "Your security",
-    body: "Add a passkey, security key, or authenticator app.",
-    adminOnly: false,
-  },
-  {
-    href: "/dashboard/account/profile",
-    icon: UserRoundIcon,
-    title: "Profile",
-    body: "Update your display name and account details.",
-    adminOnly: false,
-  },
-]
-
-const setupSteps = [
-  {
-    href: "/dashboard/organization/members",
-    title: "Invite your team",
-    body: "Send invitations and choose admin or member roles.",
-  },
-  {
-    href: "/dashboard/organization/plan",
-    title: "Upgrade to Team",
-    body: "Unlock parallel pipelines, single sign-on, and verified domains.",
-  },
-  {
-    href: "/dashboard/organization/domains",
-    title: "Verify your domain",
-    body: "Add a DNS record to prove you own your email domain.",
-  },
-  {
-    href: "/dashboard/organization/sso",
-    title: "Connect your identity provider",
-    body: "Let employees sign in with the directory they already use.",
-  },
-  {
-    href: "/dashboard/organization/security-policies",
-    title: "Require MFA",
-    body: "Enforce a second factor for every member of the organization.",
-  },
-]
-
-async function getOrganizationName(orgId?: string) {
-  if (!orgId) return undefined
-  try {
-    const { data } = await managementClient.organizations.get({ id: orgId })
-    return data.display_name || data.name
-  } catch {
-    return undefined
-  }
-}
+const cardClass =
+  "bg-card flex flex-col rounded-xl border p-5 shadow-[0_1px_2px_rgb(20_18_11/0.04)]"
 
 export default async function DashboardHome() {
   const session = await appClient.getSession()
   const user = session!.user
   const role = getRole(user)
-  const plan = getPlan(user)
   const isAdmin = role === "admin"
-  const orgName = await getOrganizationName(user.org_id)
-  // Database signups get the email as their name; use the nickname then
-  const firstName =
-    user.given_name ||
-    (user.name && !user.name.includes("@") ? user.name.split(" ")[0] : "") ||
-    user.nickname ||
-    "there"
+  const plan = getPlan(user)
+  const planInfo = plans[plan]
+
+  const [readiness, pipelines] = [
+    await getWorkspaceReadiness(user.org_id!, user.org_name ?? "Workspace"),
+    pipelineStatus(plan),
+  ]
+  const firstName = firstNameOf(user) || "there"
+
+  // The two claims the login Actions add, as they appear in the token
+  const claims: [string, unknown][] = [
+    ["plan", user[PLAN_CLAIM_KEY] ?? plan],
+    ["roles", user[ROLES_CLAIM_KEY] ?? [role]],
+  ]
+
+  const steps = [
+    {
+      title: "Upgrade to Team",
+      body: "Unlock parallel pipelines, single sign-on, and verified domains.",
+      href: "/dashboard/organization/plan",
+      done: plan !== "free",
+      status: `${planInfo.name} plan`,
+    },
+    {
+      title: "Connect your identity provider",
+      body: "Let employees sign in with Okta, Entra ID, or any SAML or OIDC provider.",
+      href: "/dashboard/organization/sso",
+      done: !!readiness.identityProvider,
+      locked: !planInfo.sso,
+      status: readiness.identityProvider
+        ? `${readiness.identityProvider} connected`
+        : planInfo.sso
+          ? "Not connected"
+          : "Needs Team",
+    },
+    {
+      title: "Invite your team",
+      body: "Send invitations and choose admin or member roles.",
+      href: "/dashboard/organization/members",
+      done: readiness.memberTotal > 1,
+      status: `${readiness.memberTotal} member${readiness.memberTotal === 1 ? "" : "s"}`,
+    },
+    {
+      title: "Verify your domain",
+      body: "Prove you own your email domain so employees are routed to the right login.",
+      href: "/dashboard/organization/domains",
+      done: readiness.verifiedDomains > 0,
+      status:
+        readiness.verifiedDomains > 0
+          ? `${readiness.verifiedDomains} verified`
+          : readiness.pendingDomains > 0
+            ? `${readiness.pendingDomains} pending`
+            : "Optional",
+    },
+    {
+      title: "Require MFA",
+      body: "Enforce a second factor for every member of the workspace.",
+      href: "/dashboard/organization/security-policies",
+      done: readiness.mfaEnforced,
+      status: readiness.mfaEnforced ? "On" : "Off",
+    },
+  ]
+  const doneCount = steps.filter((s) => s.done).length
+
+  const more = isAdmin
+    ? [
+        { href: "/dashboard/organization/general", label: "General settings" },
+        { href: "/dashboard/organization/domains", label: "Domains" },
+        {
+          href: "/dashboard/organization/security-policies",
+          label: "Security policies",
+        },
+        { href: "/dashboard/account/security", label: "Your security" },
+        { href: "/dashboard/account/profile", label: "Profile" },
+      ]
+    : [
+        { href: "/dashboard/account/security", label: "Your security" },
+        { href: "/dashboard/account/profile", label: "Profile" },
+      ]
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-10">
       <section className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <p className="eyebrow">Workspace{orgName ? ` · ${orgName}` : ""}</p>
+          <p className="eyebrow">Workspace</p>
           <h1 className="font-display mt-4 text-4xl sm:text-5xl">
-            Welcome, {firstName}
+            {readiness.name}
           </h1>
           <p className="text-muted-foreground mt-3 max-w-xl">
-            Manage who can access your organization and how they sign in, all
-            from one place.
+            Welcome, {firstName}. Here&apos;s where the workspace stands.
           </p>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/dashboard/organization/plan">
-            <Badge variant="outline">{plans[plan].name} plan</Badge>
+            <Badge variant="outline">{planInfo.name} plan</Badge>
           </Link>
           <Badge variant={isAdmin ? "brand" : "outline"} className="capitalize">
             {role}
           </Badge>
-          {isAdmin && (
-            <Button asChild>
-              <Link href="/dashboard/organization/general">
-                Organization settings <ArrowRightIcon className="size-4" />
-              </Link>
-            </Button>
-          )}
         </div>
       </section>
 
-      <section className="bg-card overflow-hidden rounded-xl border shadow-[0_1px_2px_rgb(20_18_11/0.04)]">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3">
-          {shortcuts.map(({ href, icon: Icon, title, body, adminOnly }) => {
-            const locked = adminOnly && !isAdmin
-            return (
-              <Link
-                key={href}
-                href={href}
-                className="group hover:bg-background/70 -mt-px -ml-px flex flex-col border-t border-l p-6 transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="bg-background grid size-9 place-items-center rounded-lg border">
-                    <Icon className="text-foreground/70 size-4" />
-                  </span>
-                  {locked && <Badge variant="outline">Admins only</Badge>}
-                </div>
-                <p className="mt-5 font-medium">{title}</p>
-                <p className="text-muted-foreground mt-1 text-sm">{body}</p>
-                <span className="text-brand-blue mt-4 inline-flex items-center gap-1 text-sm font-medium">
-                  Open
-                  <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-                </span>
-              </Link>
-            )
-          })}
+      <section className="grid gap-4 md:grid-cols-3">
+        <div className={cardClass}>
+          <p className="eyebrow">Plan</p>
+          <p className="font-display mt-3 text-3xl">{planInfo.name}</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {planInfo.runners === 1
+              ? "1 concurrent runner"
+              : `${planInfo.runners} concurrent runners`}{" "}
+            · {planInfo.buildMinutes.toLocaleString()} build minutes a month
+          </p>
+          <div className="mt-auto pt-5">
+            {isAdmin && plan === "free" && (
+              <Button asChild className="w-full">
+                <Link href="/dashboard/organization/plan">
+                  Upgrade to Team <ArrowRightIcon className="size-4" />
+                </Link>
+              </Button>
+            )}
+            {isAdmin && plan !== "free" && !readiness.identityProvider && (
+              <Button asChild className="w-full">
+                <Link href="/dashboard/organization/sso">
+                  Set up single sign-on <ArrowRightIcon className="size-4" />
+                </Link>
+              </Button>
+            )}
+            {isAdmin && plan !== "free" && readiness.identityProvider && (
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/dashboard/organization/plan">Manage plan</Link>
+              </Button>
+            )}
+            {!isAdmin && (
+              <p className="text-muted-foreground text-sm">
+                Ask a workspace admin to change the plan.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className={cardClass}>
+          <p className="eyebrow">Pipelines</p>
+          <p className="font-display mt-3 text-3xl">
+            {pipelines.running.length} running
+          </p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {pipelines.queued.length > 0
+              ? `${pipelines.queued.length} waiting for a runner · `
+              : ""}
+            {pipelines.inUse} of {pipelines.capacity} runners in use
+          </p>
+          <Link
+            href="/dashboard/pipelines"
+            className="text-brand-blue mt-auto inline-flex items-center gap-1 pt-5 text-sm font-medium hover:underline"
+          >
+            Open pipelines <ArrowRightIcon className="size-3.5" />
+          </Link>
+        </div>
+
+        <div className={cardClass}>
+          <p className="eyebrow">Your session</p>
+          <dl className="mt-3 space-y-1.5 font-mono text-xs">
+            {claims.map(([key, value]) => (
+              <div key={key} className="flex items-baseline gap-3">
+                <dt className="text-muted-foreground w-12 shrink-0">{key}</dt>
+                <dd className="text-brand-ink truncate">
+                  {JSON.stringify(value)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className="text-muted-foreground mt-2 text-xs">
+            Added to your token at sign-in by Belay&apos;s login Actions.
+          </p>
+          <Link
+            href="/dashboard/account/session"
+            className="text-brand-blue mt-auto inline-flex items-center gap-1 pt-5 text-sm font-medium hover:underline"
+          >
+            View decoded token <ArrowRightIcon className="size-3.5" />
+          </Link>
         </div>
       </section>
 
       {isAdmin && (
-        <section className="grid gap-8 lg:grid-cols-[1fr_1.6fr]">
-          <div>
-            <p className="eyebrow">Setup guide</p>
-            <h2 className="font-display mt-4 text-3xl">
-              Get your organization enterprise-ready
-            </h2>
-            <p className="text-muted-foreground mt-3">
-              Four steps to the identity controls security reviews ask for.
+        <section>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="eyebrow">Get enterprise-ready</p>
+              <h2 className="font-display mt-3 text-3xl">
+                The controls security reviews ask for
+              </h2>
+            </div>
+            <p className="text-muted-foreground font-mono text-xs">
+              {doneCount} of {steps.length} done
             </p>
           </div>
-          <ol className="bg-card divide-y rounded-xl border shadow-[0_1px_2px_rgb(20_18_11/0.04)]">
-            {setupSteps.map((step, i) => (
+          <ol className="bg-card mt-5 divide-y rounded-xl border shadow-[0_1px_2px_rgb(20_18_11/0.04)]">
+            {steps.map((step, i) => (
               <li key={step.href}>
                 <Link
                   href={step.href}
-                  className="group hover:bg-background/70 flex items-center gap-5 px-5 py-4 transition-colors"
+                  className="group hover:bg-background/70 flex items-center gap-4 px-5 py-4 transition-colors"
                 >
-                  <span className="text-muted-foreground font-mono text-xs">
+                  <span className="text-muted-foreground w-5 font-mono text-xs">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{step.title}</p>
-                    <p className="text-muted-foreground text-sm">{step.body}</p>
-                  </div>
-                  <ArrowRightIcon className="text-muted-foreground group-hover:text-foreground size-4 transition-transform group-hover:translate-x-0.5" />
+                  <span
+                    className={cn(
+                      "grid size-6 shrink-0 place-items-center rounded-full border",
+                      step.done
+                        ? "border-[#2d8a5e]/40 bg-[#e8f5ee] text-[#2d8a5e] dark:bg-[#2d8a5e]/15 dark:text-[#6fd3a3]"
+                        : "text-muted-foreground/50"
+                    )}
+                  >
+                    {step.done ? (
+                      <CheckIcon className="size-3.5" />
+                    ) : step.locked ? (
+                      <LockIcon className="size-3" />
+                    ) : (
+                      <CircleIcon className="size-3" />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className={cn(
+                        "block font-medium",
+                        step.done &&
+                          "text-muted-foreground line-through decoration-[1px]"
+                      )}
+                    >
+                      {step.title}
+                    </span>
+                    <span className="text-muted-foreground block text-sm">
+                      {step.body}
+                    </span>
+                  </span>
+                  <Badge variant={step.done ? "success" : "outline"}>
+                    {step.status}
+                  </Badge>
+                  <ArrowRightIcon className="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </li>
             ))}
           </ol>
         </section>
       )}
+
+      <section className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t pt-6 text-sm">
+        <span className="eyebrow">More</span>
+        {more.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </section>
     </div>
   )
 }

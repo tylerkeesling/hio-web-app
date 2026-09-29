@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto"
 import slugify from "@sindresorhus/slugify"
 
 import { managementClient } from "./auth0"
+import { firstNameOf } from "./names"
 import { DEFAULT_PLAN, Plan } from "./plan"
 
 export interface ProvisionWorkspaceInput {
@@ -70,10 +71,7 @@ export function defaultWorkspaceName(user: {
   nickname?: string | null
   email?: string | null
 }) {
-  const first =
-    (user.name && !user.name.includes("@") && user.name.split(" ")[0]) ||
-    user.nickname ||
-    user.email?.split("@")[0]
+  const first = firstNameOf(user)
 
   return first ? `${first}'s workspace` : "My workspace"
 }

@@ -4,6 +4,8 @@ import {
   applyAddDefaultRoleActionChanges,
   applyAddRoleToTokensActionChanges,
   applyBelayProvisioningActionChanges,
+  applyBlockDisposableDomainsActionChanges,
+  applyPreUserRegistrationBindingsChanges,
   applySecurityPoliciesActionChanges,
 } from "./utils/actions.mjs"
 import { applyBrandingChanges } from "./utils/branding.mjs"
@@ -251,6 +253,10 @@ async function main() {
       apiKey: provisioningApiKey,
     }
   )
+  const blockDisposableDomainsAction =
+    await applyBlockDisposableDomainsActionChanges(
+      plan.actions.blockDisposableDomains
+    )
   const securityPoliciesAction = await applySecurityPoliciesActionChanges(
     plan.actions.securityPolicies,
     dashboardClient.client_id
@@ -275,6 +281,7 @@ async function main() {
     addRoleToTokensAction,
     securityPoliciesAction,
   ])
+  await applyPreUserRegistrationBindingsChanges(blockDisposableDomainsAction)
   console.log("")
 
   // Step 8: Generate .env.local
@@ -318,6 +325,7 @@ function checkForChanges(plan) {
     plan.myAccountResourceServer.action !== "skip" ||
     plan.roles.admin.action !== "skip" ||
     plan.roles.member.action !== "skip" ||
+    plan.actions.blockDisposableDomains.action !== "skip" ||
     plan.actions.belayProvisioning.action !== "skip" ||
     plan.actions.securityPolicies.action !== "skip" ||
     plan.actions.addDefaultRole.action !== "skip" ||

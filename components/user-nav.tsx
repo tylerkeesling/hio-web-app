@@ -56,6 +56,9 @@ export async function UserNav() {
           <Link href="/dashboard/account/security">Security</Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
+          <Link href="/dashboard/account/session">Session</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
           <Link href="/dashboard/organization/general">
             Organization settings
           </Link>

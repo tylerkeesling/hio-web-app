@@ -30,6 +30,7 @@ export function createChangePlan() {
       member: null,
     },
     actions: {
+      blockDisposableDomains: null,
       belayProvisioning: null,
       securityPolicies: null,
       addDefaultRole: null,
