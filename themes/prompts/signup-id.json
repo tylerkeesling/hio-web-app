@@ -2,6 +2,6 @@
   "signup-id": {
     "pageTitle": "Sign up | ${companyName}",
     "title": "Create your account",
-    "description": "Start shipping with ${companyName}. It only takes a minute."
+    "description": "Start shipping with ${companyName}. Continue with GitHub or your work email."
   }
 }

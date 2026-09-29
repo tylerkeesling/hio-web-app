@@ -2,6 +2,6 @@
   "login-id": {
     "pageTitle": "Sign in | ${companyName}",
     "title": "Sign in",
-    "description": "Welcome back. Use your work email to continue to ${companyName}."
+    "description": "Welcome back. Continue with GitHub or your work email."
   }
 }

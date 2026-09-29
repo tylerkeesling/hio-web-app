@@ -20,6 +20,10 @@ const sidebarNavItems = [
     href: "/dashboard/organization/general",
   },
   {
+    title: "Plan & billing",
+    href: "/dashboard/organization/plan",
+  },
+  {
     title: "Members",
     href: "/dashboard/organization/members",
   },

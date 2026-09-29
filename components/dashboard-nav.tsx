@@ -8,6 +8,11 @@ import { cn } from "@/lib/utils"
 const items = [
   { href: "/dashboard", match: "/dashboard", label: "Overview", exact: true },
   {
+    href: "/dashboard/pipelines",
+    match: "/dashboard/pipelines",
+    label: "Pipelines",
+  },
+  {
     href: "/dashboard/organization/general",
     match: "/dashboard/organization",
     label: "Organization",

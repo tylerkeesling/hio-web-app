@@ -5,6 +5,7 @@ import {
   checkActionTriggerBindingsChanges,
   checkAddDefaultRoleActionChanges,
   checkAddRoleToTokensActionChanges,
+  checkBelayProvisioningActionChanges,
   checkSecurityPoliciesActionChanges,
 } from "./actions.mjs"
 import { auth0ApiCall } from "./auth0-api.mjs"
@@ -216,6 +217,9 @@ export async function buildChangePlan(resources, domain) {
     const memberRoleId = plan.roles.member.existing?.id || "TO_BE_CREATED"
 
     // Actions (will compare code to detect changes)
+    plan.actions.belayProvisioning = await checkBelayProvisioningActionChanges(
+      resources.actions
+    )
     plan.actions.securityPolicies = await checkSecurityPoliciesActionChanges(
       resources.actions
     )
@@ -284,6 +288,7 @@ export function displayChangePlan(plan) {
   categorize(plan.myAccountResourceServer)
   categorize(plan.roles.admin)
   categorize(plan.roles.member)
+  categorize(plan.actions.belayProvisioning)
   categorize(plan.actions.securityPolicies)
   categorize(plan.actions.addDefaultRole)
   categorize(plan.actions.addRoleToTokens)

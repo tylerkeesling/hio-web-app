@@ -30,6 +30,7 @@ export function createChangePlan() {
       member: null,
     },
     actions: {
+      belayProvisioning: null,
       securityPolicies: null,
       addDefaultRole: null,
       addRoleToTokens: null,

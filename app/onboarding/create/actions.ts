@@ -3,8 +3,14 @@
 import { redirect } from "next/navigation"
 import slugify from "@sindresorhus/slugify"
 
-import { managementClient, onboardingClient } from "@/lib/auth0"
+import { onboardingClient } from "@/lib/auth0"
+import { provisionWorkspace } from "@/lib/provisioning"
 
+/**
+ * Manual workspace creation. Normally the Belay Provisioning Action creates the
+ * workspace on first login; this form is the fallback when that did not happen
+ * (for example, when the provisioning API was unreachable).
+ */
 export async function createOrganization(formData: FormData) {
   const session = await onboardingClient.getSession()
 
@@ -23,34 +29,11 @@ export async function createOrganization(formData: FormData) {
   let organization
 
   try {
-    ;({ data: organization } = await managementClient.organizations.create({
-      name: slugify(organizationName),
-      display_name: organizationName,
-      enabled_connections: [
-        {
-          connection_id: process.env.DEFAULT_CONNECTION_ID,
-        },
-      ],
-    }))
-
-    await managementClient.organizations.addMembers(
-      {
-        id: organization.id,
-      },
-      {
-        members: [session.user.sub],
-      }
-    )
-
-    await managementClient.organizations.addMemberRoles(
-      {
-        id: organization.id,
-        user_id: session.user.sub,
-      },
-      {
-        roles: [process.env.AUTH0_ADMIN_ROLE_ID],
-      }
-    )
+    organization = await provisionWorkspace({
+      userId: session.user.sub,
+      displayName: organizationName,
+      slug: slugify(organizationName),
+    })
   } catch (error) {
     console.error("failed to create an organization", error)
     return {

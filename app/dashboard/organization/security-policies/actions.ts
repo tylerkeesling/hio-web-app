@@ -21,12 +21,19 @@ export const updateMfaPolicy = withServerActionAuth(
         : []
 
     try {
+      // Organization metadata is replaced as a whole, so keep the other keys
+      // (plan, domain verification token) intact
+      const { data: organization } = await managementClient.organizations.get({
+        id: session.user.org_id!,
+      })
+
       await managementClient.organizations.update(
         {
           id: session.user.org_id!,
         },
         {
           metadata: {
+            ...organization.metadata,
             mfaPolicy: JSON.stringify({
               ...DEFAULT_MFA_POLICY,
               enforce,

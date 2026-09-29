@@ -18,8 +18,9 @@ export default async function PostAuthRouter() {
     redirect("/onboarding/verify")
   }
 
-  // The dashboard app requires organization membership, so a new user creates
-  // an organization first (logging in to the dashboard without one fails)
+  // The dashboard app requires organization membership. The Belay Provisioning
+  // Action normally created a workspace during the login that just finished;
+  // if it did not, the user creates one by hand.
   const { data: orgs } = session
     ? await managementClient.users.getUserOrganizations({
         id: session.user.sub,
@@ -30,6 +31,7 @@ export default async function PostAuthRouter() {
   }
 
   const dashboardParams = new URLSearchParams({
+    organization: orgs[0].id,
     returnTo: "/dashboard",
   })
   redirect(`/auth/login?${dashboardParams.toString()}`)

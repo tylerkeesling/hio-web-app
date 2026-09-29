@@ -3,6 +3,7 @@ import {
   applyActionTriggerBindingsChanges,
   applyAddDefaultRoleActionChanges,
   applyAddRoleToTokensActionChanges,
+  applyBelayProvisioningActionChanges,
   applySecurityPoliciesActionChanges,
 } from "./utils/actions.mjs"
 import { applyBrandingChanges } from "./utils/branding.mjs"
@@ -24,6 +25,7 @@ import {
   displayChangePlan,
 } from "./utils/discovery.mjs"
 import { writeEnvFile } from "./utils/env-writer.mjs"
+import { randomSecret, readEnvFile, upsertEnvValue } from "./utils/env.mjs"
 import { confirmWithUser } from "./utils/helpers.mjs"
 import { applyUserAttributeProfileChanges } from "./utils/profiles.mjs"
 import {
@@ -233,6 +235,22 @@ async function main() {
 
   // 7j. Actions
   console.log("Configuring Actions...")
+
+  // The Belay Provisioning Action calls back into the app, so it needs the
+  // app's URL and the shared secret from .env.local.user (generated if missing)
+  const userEnv = readEnvFile(".env.local.user")
+  let provisioningApiKey = userEnv.PROVISIONING_API_KEY
+  if (!provisioningApiKey) {
+    provisioningApiKey = randomSecret()
+    upsertEnvValue(".env.local.user", "PROVISIONING_API_KEY", provisioningApiKey)
+  }
+  const belayProvisioningAction = await applyBelayProvisioningActionChanges(
+    plan.actions.belayProvisioning,
+    {
+      apiUrl: userEnv.APP_BASE_URL || "http://localhost:3000",
+      apiKey: provisioningApiKey,
+    }
+  )
   const securityPoliciesAction = await applySecurityPoliciesActionChanges(
     plan.actions.securityPolicies,
     dashboardClient.client_id
@@ -251,12 +269,12 @@ async function main() {
 
   // 7k. Action Trigger Bindings
   console.log("Configuring Action Trigger Bindings...")
-  await applyActionTriggerBindingsChanges(
-    plan.actions.bindings,
+  await applyActionTriggerBindingsChanges(plan.actions.bindings, [
+    belayProvisioningAction,
     addDefaultRoleAction,
     addRoleToTokensAction,
-    securityPoliciesAction
-  )
+    securityPoliciesAction,
+  ])
   console.log("")
 
   // Step 8: Generate .env.local
@@ -300,6 +318,7 @@ function checkForChanges(plan) {
     plan.myAccountResourceServer.action !== "skip" ||
     plan.roles.admin.action !== "skip" ||
     plan.roles.member.action !== "skip" ||
+    plan.actions.belayProvisioning.action !== "skip" ||
     plan.actions.securityPolicies.action !== "skip" ||
     plan.actions.addDefaultRole.action !== "skip" ||
     plan.actions.addRoleToTokens.action !== "skip" ||

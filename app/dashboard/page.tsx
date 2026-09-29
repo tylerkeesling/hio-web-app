@@ -7,14 +7,23 @@ import {
   ShieldCheckIcon,
   UserRoundIcon,
   UsersIcon,
+  WorkflowIcon,
 } from "lucide-react"
 
 import { appClient, managementClient } from "@/lib/auth0"
+import { getPlan, plans } from "@/lib/plan"
 import { getRole } from "@/lib/roles"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 const shortcuts = [
+  {
+    href: "/dashboard/pipelines",
+    icon: WorkflowIcon,
+    title: "Pipelines",
+    body: "Recent runs and the runners your plan includes.",
+    adminOnly: false,
+  },
   {
     href: "/dashboard/organization/members",
     icon: UsersIcon,
@@ -66,6 +75,11 @@ const setupSteps = [
     body: "Send invitations and choose admin or member roles.",
   },
   {
+    href: "/dashboard/organization/plan",
+    title: "Upgrade to Team",
+    body: "Unlock parallel pipelines, single sign-on, and verified domains.",
+  },
+  {
     href: "/dashboard/organization/domains",
     title: "Verify your domain",
     body: "Add a DNS record to prove you own your email domain.",
@@ -96,6 +110,7 @@ export default async function DashboardHome() {
   const session = await appClient.getSession()
   const user = session!.user
   const role = getRole(user)
+  const plan = getPlan(user)
   const isAdmin = role === "admin"
   const orgName = await getOrganizationName(user.org_id)
   // Database signups get the email as their name; use the nickname then
@@ -111,7 +126,7 @@ export default async function DashboardHome() {
         <div>
           <p className="eyebrow">Workspace{orgName ? ` · ${orgName}` : ""}</p>
           <h1 className="font-display mt-4 text-4xl sm:text-5xl">
-            Welcome back, {firstName}
+            Welcome, {firstName}
           </h1>
           <p className="text-muted-foreground mt-3 max-w-xl">
             Manage who can access your organization and how they sign in, all
@@ -119,6 +134,9 @@ export default async function DashboardHome() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Link href="/dashboard/organization/plan">
+            <Badge variant="outline">{plans[plan].name} plan</Badge>
+          </Link>
           <Badge variant={isAdmin ? "brand" : "outline"} className="capitalize">
             {role}
           </Badge>

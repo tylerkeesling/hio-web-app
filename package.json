@@ -8,7 +8,11 @@
     "lint": "next lint",
     "format": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
     "auth0:bootstrap": "node ./scripts/bootstrap.mjs",
-    "auth0:branding": "node ./scripts/apply-branding.mjs"
+    "auth0:branding": "node ./scripts/apply-branding.mjs",
+    "demo:action": "node ./scripts/demo.mjs action",
+    "demo:bot": "node ./scripts/demo.mjs bot",
+    "demo:reset": "node ./scripts/demo.mjs reset",
+    "demo:github": "node ./scripts/demo.mjs github"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.29.0",

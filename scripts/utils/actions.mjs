@@ -2,15 +2,56 @@ import { readFile } from "node:fs/promises"
 import { $ } from "execa"
 import ora from "ora"
 
+import { auth0ApiCall } from "./auth0-api.mjs"
 import { ChangeAction, createChangeItem } from "./change-plan.mjs"
 import { waitUntilActionIsBuilt } from "./helpers.mjs"
 
 // Constants
 export const CUSTOM_CLAIMS_NAMESPACE = "https://example.com"
+export const BELAY_PROVISIONING_ACTION_NAME = "Belay Provisioning"
+const BELAY_PROVISIONING_ACTION_FILE = "./actions/belay-provisioning.js"
 
 // ============================================================================
 // CHECK FUNCTIONS - Determine what changes are needed
 // ============================================================================
+
+/**
+ * Check if the Belay Provisioning Action needs changes
+ * Compares code with existing action
+ */
+export async function checkBelayProvisioningActionChanges(existingActions) {
+  const existingAction = existingActions.find(
+    (a) => a.name === BELAY_PROVISIONING_ACTION_NAME
+  )
+
+  if (!existingAction) {
+    return createChangeItem(ChangeAction.CREATE, {
+      resource: "Belay Provisioning Action",
+      name: BELAY_PROVISIONING_ACTION_NAME,
+    })
+  }
+
+  const desiredCode = await readFile(BELAY_PROVISIONING_ACTION_FILE, "utf8")
+  const currentAction = await auth0ApiCall(
+    "get",
+    `actions/actions/${existingAction.id}`
+  )
+
+  if (currentAction?.code?.trim() !== desiredCode.trim()) {
+    return createChangeItem(ChangeAction.UPDATE, {
+      resource: "Belay Provisioning Action",
+      name: BELAY_PROVISIONING_ACTION_NAME,
+      existing: existingAction,
+      summary: "Update code",
+    })
+  }
+
+  return createChangeItem(ChangeAction.SKIP, {
+    resource: "Belay Provisioning Action",
+    name: BELAY_PROVISIONING_ACTION_NAME,
+    existing: existingAction,
+  })
+}
 
 /**
  * Check if Security Policies Action needs changes
@@ -153,6 +194,9 @@ export async function checkActionTriggerBindingsChanges(existingActions) {
     const currentBindings = JSON.parse(stdout)
 
     // Build desired binding order based on existing actions
+    const belayProvisioningAction = existingActions.find(
+      (a) => a.name === BELAY_PROVISIONING_ACTION_NAME
+    )
     const securityPoliciesAction = existingActions.find(
       (a) => a.name === "Security Policies"
     )
@@ -165,6 +209,7 @@ export async function checkActionTriggerBindingsChanges(existingActions) {
 
     // If any action doesn't exist yet, we'll need to update bindings later
     if (
+      !belayProvisioningAction ||
       !securityPoliciesAction ||
       !addDefaultRoleAction ||
       !addRoleToTokensAction
@@ -176,8 +221,9 @@ export async function checkActionTriggerBindingsChanges(existingActions) {
     }
 
     // Check if current bindings match desired order
-    // Correct order: Add Default Role -> Add Role to Tokens -> Security Policies
+    // Correct order: Belay Provisioning -> Add Default Role -> Add Role to Tokens -> Security Policies
     const desiredOrder = [
+      belayProvisioningAction.id,
       addDefaultRoleAction.id,
       addRoleToTokensAction.id,
       securityPoliciesAction.id,
@@ -233,11 +279,14 @@ async function updateAction(actionId, code, secrets, dependencies = []) {
 
     await $`auth0 api patch actions/actions/${actionId} --data ${JSON.stringify(updateData)}`
 
-    // Update secrets if provided
+    // Update secrets if provided (split on the first "=" only; values may contain one)
     if (secrets && secrets.length > 0) {
       const mappedSecrets = secrets.map((secret) => {
-        const [key, value] = secret.split("=")
-        return { name: key, value }
+        const separator = secret.indexOf("=")
+        return {
+          name: secret.slice(0, separator),
+          value: secret.slice(separator + 1),
+        }
       })
       await $`auth0 api patch actions/actions/${actionId} --data ${JSON.stringify({ secrets: mappedSecrets })}`
     }
@@ -262,6 +311,71 @@ async function updateAction(actionId, code, secrets, dependencies = []) {
   } catch (e) {
     spinner.fail("Failed to update action")
     throw e
+  }
+}
+
+/**
+ * Apply Belay Provisioning Action changes
+ * @param {object} changePlan
+ * @param {{ apiUrl: string, apiKey: string }} belay - where the Action reaches the app, and the shared secret
+ */
+export async function applyBelayProvisioningActionChanges(
+  changePlan,
+  { apiUrl, apiKey }
+) {
+  const secrets = [
+    `BELAY_API_URL=${apiUrl.replace(/\/$/, "")}`,
+    `BELAY_API_KEY=${apiKey}`,
+    `CUSTOM_CLAIMS_NAMESPACE=${CUSTOM_CLAIMS_NAMESPACE}`,
+  ]
+
+  if (changePlan.action === ChangeAction.SKIP) {
+    const spinner = ora({
+      text: `Using existing ${BELAY_PROVISIONING_ACTION_NAME} Action without changes`,
+    }).start()
+    spinner.succeed()
+    return changePlan.existing
+  }
+
+  const code = await readFile(BELAY_PROVISIONING_ACTION_FILE, {
+    encoding: "utf-8",
+  })
+
+  if (changePlan.action === ChangeAction.CREATE) {
+    const spinner = ora({
+      text: `Creating ${BELAY_PROVISIONING_ACTION_NAME} Action`,
+    }).start()
+
+    try {
+      // Created through the API rather than the CLI to pin the Node 22 runtime (global fetch)
+      const action = await auth0ApiCall("post", "actions/actions", {
+        name: BELAY_PROVISIONING_ACTION_NAME,
+        code,
+        runtime: "node22",
+        supported_triggers: [{ id: "post-login", version: "v3" }],
+        secrets: secrets.map((secret) => {
+          const separator = secret.indexOf("=")
+          return {
+            name: secret.slice(0, separator),
+            value: secret.slice(separator + 1),
+          }
+        }),
+      })
+
+      await waitUntilActionIsBuilt(action.id)
+      await $`auth0 actions deploy ${action.id} --json --no-input`
+
+      spinner.succeed(`Created ${BELAY_PROVISIONING_ACTION_NAME} Action`)
+      return action
+    } catch (e) {
+      spinner.fail(`Failed to create the ${BELAY_PROVISIONING_ACTION_NAME} Action`)
+      throw e
+    }
+  }
+
+  if (changePlan.action === ChangeAction.UPDATE) {
+    await updateAction(changePlan.existing.id, code, secrets)
+    return changePlan.existing
   }
 }
 
@@ -477,13 +591,18 @@ export async function applyAddRoleToTokensActionChanges(changePlan) {
 
 /**
  * Apply Action Trigger Bindings changes
+ * @param {object} changePlan
+ * @param {Array<{ name: string }>} actions - the post-login Actions, in the order they should run
  */
-export async function applyActionTriggerBindingsChanges(
-  changePlan,
-  addDefaultRoleAction,
-  addRoleToTokensAction,
-  securityPoliciesAction
-) {
+export async function applyActionTriggerBindingsChanges(changePlan, actions) {
+  if (changePlan?.action === ChangeAction.SKIP) {
+    const spinner = ora({
+      text: `Trigger bindings for Actions are up to date`,
+    }).start()
+    spinner.succeed()
+    return
+  }
+
   const spinner = ora({
     text: `Updating trigger bindings for Actions`,
   }).start()
@@ -493,29 +612,10 @@ export async function applyActionTriggerBindingsChanges(
     const updateTriggerBindingsArgs = [
       "api", "patch", "actions/triggers/post-login/bindings",
       "--data", JSON.stringify({
-        "bindings": [
-          {
-            "ref": {
-              "type": "action_name",
-              "value": addDefaultRoleAction.name
-            },
-            display_name: addDefaultRoleAction.name
-          },
-          {
-            "ref": {
-              "type": "action_name",
-              "value": addRoleToTokensAction.name
-            },
-            display_name: addRoleToTokensAction.name
-          },
-          {
-            "ref": {
-              "type": "action_name",
-              "value": securityPoliciesAction.name
-            },
-            display_name: securityPoliciesAction.name
-          }
-        ]
+        bindings: actions.map((action) => ({
+          ref: { type: "action_name", value: action.name },
+          display_name: action.name,
+        })),
       }),
     ];
 

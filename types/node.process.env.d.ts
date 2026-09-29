@@ -29,5 +29,11 @@ declare namespace NodeJS {
 
     // Set to "false" to skip the onboarding email verification step (default: required)
     REQUIRE_EMAIL_VERIFICATION?: string
+
+    // Shared secret the Belay Provisioning Action presents when it calls /api/provision
+    PROVISIONING_API_KEY?: string
+
+    // Optional: the GitHub social connection ID, enabled on every new workspace
+    GITHUB_CONNECTION_ID?: string
   }
 }
