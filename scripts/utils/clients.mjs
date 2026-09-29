@@ -52,6 +52,9 @@ const MANAGEMENT_API_SCOPES = [
   "create:scim_config",
   "update:scim_config",
   "delete:scim_config",
+  // Demo controls (Bot Detection challenge switch)
+  "read:attack_protection",
+  "update:attack_protection",
 ]
 
 // ============================================================================

@@ -1,0 +1,8 @@
+# CLI deploys upload the working tree. Keep local secrets and build output out;
+# Vercel supplies the environment variables itself.
+.env*
+!.env.example
+!.env.local.user.example
+.git
+.next
+node_modules

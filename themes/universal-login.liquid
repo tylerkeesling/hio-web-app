@@ -27,9 +27,42 @@
         background: var(--bl-canvas);
       }
       .bl-shell {
+        position: relative;
         display: grid;
         grid-template-columns: 1fr;
         min-height: 100vh;
+      }
+      /* Icon-only way out of the login flow, back to the Belay landing page */
+      .bl-home {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 2;
+        display: grid;
+        place-items: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        color: var(--bl-muted);
+        transition: background-color 150ms, color 150ms;
+      }
+      .bl-home:hover {
+        background: rgb(20 18 11 / 0.06);
+        color: var(--bl-ink);
+      }
+      .bl-home:focus-visible {
+        outline: 2px solid #0278d5;
+        outline-offset: 2px;
+      }
+      .bl-home svg {
+        width: 20px;
+        height: 20px;
+      }
+      @media (max-width: 600px) {
+        .bl-home {
+          top: 12px;
+          right: 12px;
+        }
       }
       /* Brand panel (desktop only) */
       .bl-brand {
@@ -175,6 +208,12 @@
   </head>
   <body>
     <div class="bl-shell">
+      <a class="bl-home" id="bl-home" href="https://belay-demo.vercel.app/" aria-label="Back to Belay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </svg>
+      </a>
       <aside class="bl-brand" aria-hidden="true">
         <span class="bl-logo">
           <svg viewBox="0 0 32 32" stroke-linejoin="round" stroke-width="1.2">
@@ -207,5 +246,28 @@
         {%- auth0:widget -%}
       </div>
     </div>
+    <script>
+      // Send the close button back to the Belay app the visitor came from.
+      // Page templates can't see the app's URL, so remember the referring
+      // origin from the first screen; later screens are referred by Auth0.
+      (function () {
+        var APP_ORIGINS = ["https://belay-demo.vercel.app", "http://localhost:3000"];
+        var link = document.getElementById("bl-home");
+        var origin = "";
+        try {
+          origin = new URL(document.referrer).origin;
+        } catch (e) {}
+        try {
+          if (APP_ORIGINS.indexOf(origin) !== -1) {
+            sessionStorage.setItem("bl-home", origin);
+          } else {
+            origin = sessionStorage.getItem("bl-home") || "";
+          }
+        } catch (e) {}
+        if (APP_ORIGINS.indexOf(origin) !== -1) {
+          link.href = origin + "/";
+        }
+      })();
+    </script>
   </body>
 </html>

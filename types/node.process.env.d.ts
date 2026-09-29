@@ -35,5 +35,8 @@ declare namespace NodeJS {
 
     // Optional: the GitHub social connection ID, enabled on every new workspace
     GITHUB_CONNECTION_ID?: string
+
+    // Optional: unlocks the landing page's hidden Bot Detection switch (/demo?key=...)
+    DEMO_CONTROLS_KEY?: string
   }
 }

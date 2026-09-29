@@ -9,7 +9,8 @@
 //
 //   npm run demo:bot on|off
 //       Force the bot-detection challenge on every password sign-up (on), or
-//       restore the default so it only fires when Auth0 suspects a bot (off).
+//       go back to challenging only when Auth0 suspects a bot (off). The
+//       landing page has the same switch; see lib/demo-controls.ts.
 //
 //   npm run demo:reset <email>
 //       Delete the demo user and any workspace they were the only member of,
@@ -125,7 +126,7 @@ async function toggleBotChallenge(args) {
     throw new Error("Usage: npm run demo:bot on|off")
   }
 
-  const policy = mode === "on" ? "always" : "never"
+  const policy = mode === "on" ? "always" : "when_risky"
   await step(`Setting bot detection password challenge to "${policy}"`, () =>
     auth0ApiCall("patch", "attack-protection/bot-detection", {
       challenge_password_policy: policy,

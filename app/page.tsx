@@ -15,12 +15,14 @@ import {
 
 import { appClient } from "@/lib/auth0"
 import { brand } from "@/lib/brand"
+import { demoControlsUnlocked, getBotChallengePolicy } from "@/lib/demo-controls"
 import { Button } from "@/components/ui/button"
 import { HeroIllustration } from "@/components/marketing/hero-illustration"
 import { MembersMock, PipelineMock } from "@/components/marketing/product-mocks"
 import { SiteFooter } from "@/components/marketing/site-footer"
 import { SiteHeader } from "@/components/marketing/site-header"
 
+import { BotChallengeTrigger } from "./bot-challenge-trigger"
 import { SignUpForm } from "./signup-form"
 import { WelcomeBackCard } from "./welcome-back-card"
 
@@ -132,7 +134,13 @@ function FeatureList({
 }
 
 export default async function Home() {
-  const session = await appClient.getSession()
+  const [session, demoControls] = await Promise.all([
+    appClient.getSession(),
+    demoControlsUnlocked(),
+  ])
+  const botPolicy = demoControls
+    ? await getBotChallengePolicy().catch(() => null)
+    : null
 
   return (
     <div className="bg-background min-h-screen">
@@ -143,7 +151,13 @@ export default async function Home() {
         <section className="bg-hero-wash relative overflow-hidden border-b">
           <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pt-14 pb-16 sm:px-6 md:pt-20 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:pb-24">
             <div>
-              <p className="eyebrow">Software delivery, secured</p>
+              {demoControls ? (
+                <BotChallengeTrigger initialPolicy={botPolicy}>
+                  Software delivery, secured
+                </BotChallengeTrigger>
+              ) : (
+                <p className="eyebrow">Software delivery, secured</p>
+              )}
               <h1 className="font-display mt-6 max-w-2xl text-5xl text-balance sm:text-6xl lg:text-[4.5rem]">
                 {brand.tagline}
               </h1>
